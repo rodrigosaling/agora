@@ -1,0 +1,25 @@
+{
+  "name": "tags",
+  "version": "0.0.1",
+  "description": "Save events in your day using only tags.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rodrigosaling/tags.git"
+  },
+  "keywords": [
+    "react",
+    "nodejs",
+    "vite",
+    "unocss"
+  ],
+  "author": "Rodrigo Saling",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rodrigosaling/tags/issues"
+  },
+  "homepage": "https://github.com/rodrigosaling/tags#readme"
+}
