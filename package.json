@@ -13,7 +13,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --quiet --fix",
+    "lint": "eslint",
     "prepare": "husky install"
   },
   "repository": {
@@ -38,7 +38,10 @@
     "typescript": "^5.1.3"
   },
   "lint-staged": {
-    "**/*": [
+    "*.{js, jsx,ts,tsx}": [
+      "eslint --quiet --fix"
+    ],
+    "*.{json,js,ts,jsx,tsx,html}": [
       "prettier --write --ignore-unknown"
     ]
   }
