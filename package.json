@@ -12,7 +12,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --quiet --fix",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,13 @@
   ],
   "devDependencies": {
     "@tags/eslint-config": "*",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
     "typescript": "^5.1.3"
+  },
+  "lint-staged": {
+    "**/*": [
+      "prettier --write --ignore-unknown"
+    ]
   }
 }
