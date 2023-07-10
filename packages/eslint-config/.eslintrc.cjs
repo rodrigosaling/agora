@@ -15,6 +15,8 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
+    // https://stackoverflow.com/a/44939592/785985
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
   root: true,
 };
