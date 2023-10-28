@@ -17,6 +17,23 @@ module.exports = {
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
     // https://stackoverflow.com/a/44939592/785985
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/issues/302#issuecomment-425512505
+    // 'jsx-a11y/label-has-associated-control': [
+    //   'error',
+    //   {
+    //     required: {
+    //       some: ['nesting', 'id'],
+    //     },
+    //   },
+    // ],
+    // 'jsx-a11y/label-has-for': [
+    //   'error',
+    //   {
+    //     required: {
+    //       some: ['nesting', 'id'],
+    //     },
+    //   },
+    // ],
   },
   root: true,
 };

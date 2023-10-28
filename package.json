@@ -4,7 +4,7 @@
   "description": "Save events in your day using only tags.",
   "author": "Rodrigo Saling",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "bugs": {
     "url": "https://github.com/rodrigosaling/tags/issues"
   },
