@@ -3,6 +3,7 @@ export const up = (knex) =>
     table.increments('id');
     table.integer('eventId').unsigned().notNullable();
     table.integer('tagId').unsigned().notNullable();
+    table.boolean('isDeleted').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
 
     table.foreign('eventId').references('id').inTable('events');

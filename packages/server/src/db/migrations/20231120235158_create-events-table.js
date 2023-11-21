@@ -3,6 +3,7 @@ export const up = (knex) =>
     table.increments('id');
     table.datetime('date').notNullable();
     table.boolean('isPersonal').notNullable().defaultTo(true);
+    table.boolean('isDeleted').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
   });
 

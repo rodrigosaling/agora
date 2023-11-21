@@ -3,6 +3,7 @@ export const up = (knex) =>
     table.increments('id');
     table.integer('peopleId').unsigned().notNullable();
     table.integer('familyId').unsigned().notNullable();
+    table.boolean('isDeleted').notNullable().defaultTo(false);
     table.timestamps(true, true, true);
 
     table.foreign('peopleId').references('id').inTable('people');
