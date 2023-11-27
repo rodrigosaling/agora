@@ -1,26 +1,29 @@
 import express from 'express';
-import knex from 'knex';
-import knexConfig from './db/knexfile';
+import cors from 'cors';
+
+import { TAGS_BASE_URL, router } from './tags.routes';
 
 const app = express();
 const port = 3000;
 
-const env = process.env.NODE_ENV || 'development';
-// console.log({ env, diretorio, knexConfig });
-const sql = knex(knexConfig[env]);
+app.use(cors());
+// app.use(
+//   cors({
+//     origin: 'http://localhost:5173',
+//     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   })
+// );
+// app.options('*', cors()); // include before other routes
+
+// app.use(express.urlencoded()); // to support URL-encoded bodies
+app.use(express.json()); // to support JSON-encoded bodies
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/select', (req, res) => {
-  sql('tags')
-    .select({
-      id: 'id',
-      name: 'name',
-    })
-    .then((tags) => res.json(tags));
-});
+// Routes
+app.use(TAGS_BASE_URL, router);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console

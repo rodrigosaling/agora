@@ -1,7 +1,7 @@
 {
-  "name": "@tags/server",
+  "name": "@events/server",
   "version": "0.0.1",
-  "description": "the server side of Tags",
+  "description": "the server side of Events",
   "main": "index.js",
   "type": "module",
   "scripts": {

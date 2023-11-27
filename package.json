@@ -1,23 +1,25 @@
 {
-  "name": "tags",
+  "name": "events",
   "version": "0.0.1",
-  "description": "Save events in your day using only tags.",
+  "description": "Save events in your day.",
   "author": "Rodrigo Saling",
   "license": "MIT",
   "private": true,
   "bugs": {
-    "url": "https://github.com/rodrigosaling/tags/issues"
+    "url": "https://github.com/rodrigosaling/events/issues"
   },
-  "homepage": "https://github.com/rodrigosaling/tags#readme",
+  "homepage": "https://github.com/rodrigosaling/events#readme",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "web": "cd packages/web && npm run dev",
+    "server": "cd packages/server && npm run dev:watch"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rodrigosaling/tags.git"
+    "url": "git+https://github.com/rodrigosaling/events.git"
   },
   "keywords": [
     "react",
@@ -31,7 +33,7 @@
     "packages/eslint-config"
   ],
   "devDependencies": {
-    "@tags/eslint-config": "*",
+    "@events/eslint-config": "*",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "typescript": "^5.1.3"
