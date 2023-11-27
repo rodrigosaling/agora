@@ -14,6 +14,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
+    "start": "concurrently 'npm run web' 'npm run server'",
     "web": "cd packages/web && npm run dev",
     "server": "cd packages/server && npm run dev:watch"
   },
@@ -34,6 +35,7 @@
   ],
   "devDependencies": {
     "@events/eslint-config": "*",
+    "concurrently": "^8.2.2",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "typescript": "^5.1.3"
