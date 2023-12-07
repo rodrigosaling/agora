@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import React from '@vitejs/plugin-react';
+// eslint-disable-next-line import/no-unresolved
+import UnoCSS from 'unocss/vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [React(), UnoCSS()],
+  clearScreen: false,
 });

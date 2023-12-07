@@ -28,10 +28,7 @@ async function getData(url = '') {
 async function postData(url = '', data = {}) {
   // Default options are marked with *
   const response = await fetch(`${SERVER_URL}${url}`, {
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    mode: 'cors', // no-cors, *cors, same-origin
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'same-origin', // include, *same-origin, omit
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       // 'Content-Type': 'application/x-www-form-urlencoded',
@@ -72,7 +69,7 @@ function App() {
   return (
     <>
       <header>
-        <h1>Tags</h1>
+        <h1 className="text-indigo ml-12 underline underline-dotted">Tags</h1>
 
         <nav>
           <ul>

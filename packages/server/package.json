@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx ./src/index.ts",
-    "dev:watch": "tsx watch ./src/index.ts",
+    "dev": "tsx ./src/index.ts --clear-screen=false",
+    "dev:watch": "tsx watch ./src/index.ts --clear-screen=false",
     "build": "tsup ./src/index.ts --format esm",
     "test": "vitest",
     "coverage": "vitest run --coverage",

@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// eslint-disable-next-line import/no-unresolved
+import 'virtual:uno.css';
+
 import App from './app';
 import './index.css';
 
