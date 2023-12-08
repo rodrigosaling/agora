@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 
-import { TAGS_BASE_URL, router } from './tags.routes';
+import { TAGS_BASE_URL, router as tagsRoutes } from './tags.routes';
+import { LOGIN_BASE_URL, router as loginRoutes } from './login.routes';
 
 const app = express();
 const port = 3000;
@@ -23,7 +24,8 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-app.use(TAGS_BASE_URL, router);
+app.use(TAGS_BASE_URL, tagsRoutes);
+app.use(LOGIN_BASE_URL, loginRoutes);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console

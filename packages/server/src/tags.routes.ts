@@ -7,9 +7,26 @@ import { TAGS_TABLE_NAME } from './db/constants/tags.constants';
 const env = process.env.NODE_ENV || 'development';
 const sql = knex(knexConfig[env]);
 
-const router = express.Router();
+export const router = express.Router();
 
-const TAGS_BASE_URL = '/tags';
+export const TAGS_BASE_URL = '/tags';
+
+router.use(async (req, res, next) => {
+  const { authorization } = req.headers;
+
+  if (!authorization) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Check if the hash exists in the people table
+  const person = await sql('people').select('hash').where({ hash }).first();
+
+  if (!person) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  return next();
+});
 
 router.get('/', async (req, res) => {
   const { deleted } = req.query;
@@ -119,5 +136,3 @@ router.delete('/:hash', async (req, res) => {
       .json({ error: 'Oops! Something went wrong. Please try again later.' });
   }
 });
-
-export { TAGS_BASE_URL, router };

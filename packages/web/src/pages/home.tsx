@@ -1,50 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import './app.css';
-
-const SERVER_URL = 'http://localhost:3000';
-
-async function getData(url = '') {
-  const response = await fetch(`${SERVER_URL}${url}`, {
-    // method: 'GET',
-    // headers: { 'Content-Type': 'application/json' },
-  });
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return response.json(); // parses JSON response into native JavaScript objects
-}
-
-async function postData(url = '', data = {}) {
-  const response = await fetch(`${SERVER_URL}${url}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: JSON.stringify(data), // body data type must match "Content-Type" header
-  });
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return response.json(); // parses JSON response into native JavaScript objects
-}
-
-async function putData(url = '', data = {}) {
-  const response = await fetch(`${SERVER_URL}${url}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      // 'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: JSON.stringify(data), // body data type must match "Content-Type" header
-  });
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return response.json(); // parses JSON response into native JavaScript objects
-}
+import { getData } from '../api/get-data';
+import { postData } from '../api/post-data';
+import { putData } from '../api/put-data';
 
 type Inputs = {
   name: string;
@@ -55,7 +14,7 @@ type Tags = {
   hash: string;
 };
 
-function App() {
+export default function App() {
   const queryClient = useQueryClient();
 
   const queryTags = useQuery({
@@ -69,7 +28,7 @@ function App() {
   });
 
   const createTag = useMutation({
-    mutationFn: (newTag) => postData('/tags', newTag),
+    mutationFn: (formData) => postData('/tags', formData),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'], exact: true });
@@ -200,5 +159,3 @@ function App() {
     </>
   );
 }
-
-export default App;
