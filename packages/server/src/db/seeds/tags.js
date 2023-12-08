@@ -4,9 +4,9 @@ export const seed = async (knex) => {
   await knex('tags').del();
 
   // Inserts seed entries
-  await knex('tags').insert([
-    { name: 'lola' },
-    { name: 'fred' },
-    { name: 'casa' },
-  ]);
+  // await knex('tags').insert([
+  //   { name: 'lola' },
+  //   { name: 'fred' },
+  //   { name: 'casa' },
+  // ]);
 };
