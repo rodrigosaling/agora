@@ -19,7 +19,10 @@ router.use(async (req, res, next) => {
   }
 
   // Check if the hash exists in the people table
-  const person = await sql('people').select('hash').where({ hash }).first();
+  const person = await sql('people')
+    .select('hash')
+    .where({ hash: authorization })
+    .first();
 
   if (!person) {
     return res.status(401).json({ error: 'Unauthorized' });

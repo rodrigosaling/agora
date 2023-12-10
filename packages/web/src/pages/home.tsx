@@ -1,9 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { getData } from '../api/get-data';
-import { postData } from '../api/post-data';
-import { putData } from '../api/put-data';
+import { Link } from 'react-router-dom';
+import { getDataWithAuthorization } from '../api/get-data';
+import { postDataWithAuthorization } from '../api/post-data';
+import { putDataWithAuthorization } from '../api/put-data';
 
 type Inputs = {
   name: string;
@@ -19,16 +20,16 @@ export default function App() {
 
   const queryTags = useQuery({
     queryKey: ['tags'],
-    queryFn: () => getData('/tags'),
+    queryFn: () => getDataWithAuthorization('/tags'),
   });
 
   const queryDeletedTags = useQuery({
     queryKey: ['tags', 'deleted'],
-    queryFn: () => getData('/tags?deleted=true'),
+    queryFn: () => getDataWithAuthorization('/tags?deleted=true'),
   });
 
   const createTag = useMutation({
-    mutationFn: (formData) => postData('/tags', formData),
+    mutationFn: (formData) => postDataWithAuthorization('/tags', formData),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'], exact: true });
@@ -36,7 +37,7 @@ export default function App() {
   });
 
   const deleteTag = useMutation({
-    mutationFn: (hash) => putData(`/tags/${hash}/delete`),
+    mutationFn: (hash) => putDataWithAuthorization(`/tags/${hash}/delete`),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'] });
@@ -44,7 +45,7 @@ export default function App() {
   });
 
   const restoreTag = useMutation({
-    mutationFn: (hash) => putData(`/tags/${hash}/restore`),
+    mutationFn: (hash) => putDataWithAuthorization(`/tags/${hash}/restore`),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'] });
@@ -80,6 +81,9 @@ export default function App() {
             <li>Reports</li>
             <li>Tags</li>
             <li>Preferences</li>
+            <li>
+              <Link to="/logout">Logout</Link>
+            </li>
           </ul>
         </nav>
       </header>

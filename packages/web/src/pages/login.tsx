@@ -4,6 +4,10 @@ import { useMutation } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { postData } from '../api/post-data';
+import {
+  LOCAL_STORAGE_PERSON_HASH,
+  LOCAL_STORAGE_PERSON_NAME,
+} from '../constants/local-storage';
 
 type Inputs = {
   email: string;
@@ -16,8 +20,8 @@ export default function Login() {
     mutationFn: (formData: Record<string, string>) =>
       postData('/login', formData),
     onSuccess: (response) => {
-      localStorage.setItem('personHash', response.hash);
-      localStorage.setItem('personName', response.name);
+      localStorage.setItem(LOCAL_STORAGE_PERSON_HASH, response.hash);
+      localStorage.setItem(LOCAL_STORAGE_PERSON_NAME, response.name);
       navigate('/home');
     },
   });

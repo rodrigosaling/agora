@@ -9,6 +9,7 @@ import './index.css';
 
 import Login from './pages/login';
 import Home from './pages/home';
+import Logout from './pages/logout';
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,14 @@ const router = createBrowserRouter([
   {
     path: '/home',
     element: <Home />,
+  },
+  {
+    path: '/logout',
+    element: <Logout />,
+  },
+  {
+    path: '*',
+    element: <div>404</div>,
   },
 ]);
 
