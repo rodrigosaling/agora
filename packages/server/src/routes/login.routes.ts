@@ -1,7 +1,7 @@
 import express from 'express';
 import knex from 'knex';
-import knexConfig from './db/knexfile';
-import { PEOPLE_TABLE_NAME } from './db/constants/people.constants';
+import knexConfig from '../db/knexfile';
+import { PEOPLE_TABLE_NAME } from '../db/constants/people.constants';
 
 const env = process.env.NODE_ENV || 'development';
 const sql = knex(knexConfig[env]);

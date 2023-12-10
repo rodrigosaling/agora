@@ -1,5 +1,8 @@
+/* eslint-disable import/extensions */
+import { EVENTS_TABLE_NAME } from '../constants/events.constants.js';
+
 export const up = (knex) =>
-  knex.schema.createTable('events', (table) => {
+  knex.schema.createTable(EVENTS_TABLE_NAME, (table) => {
     table.increments('id');
     table.datetime('date').notNullable();
     table.string('hash', 11).notNullable().unique();
@@ -8,4 +11,4 @@ export const up = (knex) =>
     table.timestamps(true, true, true);
   });
 
-export const down = (knex) => knex.schema.dropTable('events');
+export const down = (knex) => knex.schema.dropTable(EVENTS_TABLE_NAME);

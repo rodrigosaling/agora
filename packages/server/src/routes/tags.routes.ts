@@ -1,36 +1,25 @@
-import express from 'express';
-import knex from 'knex';
-import { nanoid } from 'nanoid';
-import knexConfig from './db/knexfile';
-import { TAGS_TABLE_NAME } from './db/constants/tags.constants';
+/**
+ * This file contains the routes for handling tags in the server.
+ */
 
-const env = process.env.NODE_ENV || 'development';
-const sql = knex(knexConfig[env]);
+import express from 'express';
+import { nanoid } from 'nanoid';
+import { TAGS_TABLE_NAME } from '../db/constants/tags.constants';
+import { sql } from '../db/sql';
 
 export const router = express.Router();
 
 export const TAGS_BASE_URL = '/tags';
 
-router.use(async (req, res, next) => {
-  const { authorization } = req.headers;
-
-  if (!authorization) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  // Check if the hash exists in the people table
-  const person = await sql('people')
-    .select('hash')
-    .where({ hash: authorization })
-    .first();
-
-  if (!person) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  return next();
-});
-
+/**
+ * GET /tags
+ *
+ * Retrieves tags from the database based on the 'deleted' query parameter.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The retrieved tags as a JSON response.
+ */
 router.get('/', async (req, res) => {
   const { deleted } = req.query;
 
@@ -47,8 +36,14 @@ router.get('/', async (req, res) => {
   }
 });
 
-/** Creates a new tag in the database. First the code checks for the same tag
- * already existing in the database. If it does, it returns the existing tag.
+/**
+ * POST /tags
+ *
+ * Creates a new tag in the database. Checks if the tag already exists and returns the existing tag if found.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The created tag as a JSON response.
  */
 router.post('/', async (req, res) => {
   const { name } = req.body;
@@ -80,8 +75,41 @@ router.post('/', async (req, res) => {
 });
 
 /**
- * Logical delete of a tag. This allows us to keep the tag in the database
- * but not show it to the user, and also rollback the delete if needed.
+ * PUT /tags/:hash
+ *
+ * Updates the name of a tag in the database.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The updated tag as a JSON response.
+ */
+router.put('/:hash', async (req, res) => {
+  const { hash } = req.params;
+  const { name } = req.body;
+
+  try {
+    await sql(TAGS_TABLE_NAME)
+      .where({
+        hash,
+      })
+      .update({ name });
+
+    res.json({ hash, name });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: 'Oops! Something went wrong. Please try again later.' });
+  }
+});
+
+/**
+ * PUT /tags/:hash/delete
+ *
+ * Logically deletes a tag in the database.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The deleted tag as a JSON response.
  */
 router.put('/:hash/delete', async (req, res) => {
   const { hash } = req.params;
@@ -102,8 +130,13 @@ router.put('/:hash/delete', async (req, res) => {
 });
 
 /**
- * Restore a tag that was previously logically deleted. This will make the
- * tag visible again.
+ * PUT /tags/:hash/restore
+ *
+ * Restores a logically deleted tag in the database.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The restored tag as a JSON response.
  */
 router.put('/:hash/restore', async (req, res) => {
   const { hash } = req.params;
@@ -124,14 +157,19 @@ router.put('/:hash/restore', async (req, res) => {
 });
 
 /**
- * Physical delete of a tag. This will remove the tag from the database
- * permanently.
+ * DELETE /tags/:hash
+ *
+ * Physically deletes a tag from the database.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The deleted tag as a JSON response.
  */
 router.delete('/:hash', async (req, res) => {
   const { hash } = req.params;
 
   try {
-    await sql(TAGS_TABLE_NAME).where({ hash }).del();
+    await sql(TAGS_TABLE_NAME).where({ hash }).delete();
     res.json({ hash });
   } catch (error) {
     res
