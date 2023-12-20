@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import { SERVER_URL } from '../constants/SERVER_URL';
-import { LOCAL_STORAGE_PERSON_HASH } from '../constants/local-storage';
+import { SERVER_URL } from '../constants/server-url';
+import { LOCAL_STORAGE_TOKEN } from '../constants/local-storage';
 
 export async function postData(url = '', data = {}, headers = {}) {
   const response = await fetch(`${SERVER_URL}${url}`, {
@@ -20,6 +20,6 @@ export async function postData(url = '', data = {}, headers = {}) {
 
 export function postDataWithAuthorization(url = '', data = {}) {
   return postData(url, data, {
-    authorization: localStorage.getItem(LOCAL_STORAGE_PERSON_HASH),
+    Authorization: localStorage.getItem(LOCAL_STORAGE_TOKEN),
   });
 }

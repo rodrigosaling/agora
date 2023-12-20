@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import express from 'express';
 import knex from 'knex';
+// import * as jose from 'jose';
 import knexConfig from '../db/knexfile';
 
 const env = process.env.NODE_ENV || 'development';
@@ -15,10 +16,14 @@ router.use(async (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Check if the hash exists in the people table
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const jwt = authorization;
+
+  const { payload } = await jose.jwtVerify(jwt, secret);
+
   const person = await sql('people')
     .select('hash')
-    .where({ hash: authorization })
+    .where({ hash: payload.hash })
     .first();
 
   if (!person) {

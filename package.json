@@ -47,5 +47,8 @@
     "*.{js,jsx,ts,tsx,html,css,md,json}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "jose": "^5.1.3"
   }
 }

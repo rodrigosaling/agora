@@ -10,6 +10,7 @@ import './index.css';
 import Login from './pages/login';
 import Home from './pages/home';
 import Logout from './pages/logout';
+import Tags from './pages/tags';
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,18 @@ const router = createBrowserRouter([
   {
     path: '/home',
     element: <Home />,
+  },
+  {
+    path: '/tags',
+    element: <Tags />,
+  },
+  {
+    path: '/reports',
+    element: <div>Reports</div>,
+  },
+  {
+    path: '/preferences',
+    element: <div>Preferences</div>,
   },
   {
     path: '/logout',

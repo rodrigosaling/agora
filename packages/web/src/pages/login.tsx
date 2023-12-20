@@ -4,10 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { postData } from '../api/post-data';
-import {
-  LOCAL_STORAGE_PERSON_HASH,
-  LOCAL_STORAGE_PERSON_NAME,
-} from '../constants/local-storage';
+import { LOCAL_STORAGE_TOKEN } from '../constants/local-storage';
 
 type Inputs = {
   email: string;
@@ -16,12 +13,11 @@ type Inputs = {
 export default function Login() {
   const navigate = useNavigate();
 
-  const createTag = useMutation({
+  const login = useMutation({
     mutationFn: (formData: Record<string, string>) =>
       postData('/login', formData),
     onSuccess: (response) => {
-      localStorage.setItem(LOCAL_STORAGE_PERSON_HASH, response.hash);
-      localStorage.setItem(LOCAL_STORAGE_PERSON_NAME, response.name);
+      localStorage.setItem(LOCAL_STORAGE_TOKEN, response);
       navigate('/home');
     },
   });
@@ -32,8 +28,7 @@ export default function Login() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = (formData) =>
-    createTag.mutate(formData);
+  const onSubmit: SubmitHandler<Inputs> = (formData) => login.mutate(formData);
 
   return (
     <main>
