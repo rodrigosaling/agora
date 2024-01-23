@@ -12,11 +12,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install",
     "dev": "concurrently 'npm run web' 'npm run server'",
     "web": "cd packages/web && npm run dev",
-    "server": "cd packages/server && npm run dev:watch"
+    "server": "cd packages/server && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
