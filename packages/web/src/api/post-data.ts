@@ -1,12 +1,12 @@
 /* eslint-disable import/prefer-default-export */
 import { SERVER_URL } from '../constants/server-url';
-import { LOCAL_STORAGE_TOKEN } from '../constants/local-storage';
+import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
 
 export async function postData(url = '', data = {}, headers = {}) {
   const response = await fetch(`${SERVER_URL}${url}`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/json',
       // 'Content-Type': 'application/x-www-form-urlencoded',
       ...headers,
     },
@@ -20,6 +20,6 @@ export async function postData(url = '', data = {}, headers = {}) {
 
 export function postDataWithAuthorization(url = '', data = {}) {
   return postData(url, data, {
-    Authorization: localStorage.getItem(LOCAL_STORAGE_TOKEN),
+    Authorization: `Bearer ${localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN)}`,
   });
 }

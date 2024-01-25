@@ -16,7 +16,10 @@ export const LOGIN_BASE_URL = '/login';
 router.post('/', async (req, res) => {
   const { email } = req.body;
   const sanitizedEmail = email.trim().toLocaleLowerCase();
+
   try {
+    const temporaryRefreshtoken = '18473yrghfbv';
+
     const results = await sql(PEOPLE_TABLE_NAME)
       .select('name', 'hash')
       .where({ email: sanitizedEmail });
@@ -34,10 +37,13 @@ router.post('/', async (req, res) => {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const token = await new jose.SignJWT(results[0])
       .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('1h')
+      .setExpirationTime('3hours')
       .sign(secret);
 
-    return res.json(token);
+    return res.json({
+      refreshToken: temporaryRefreshtoken,
+      accessToken: token,
+    });
   } catch (error) {
     return res
       .status(500)
@@ -45,23 +51,23 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/refresh-token', authorizationMiddleware, (req, res) => {
-  // Assuming the refresh token is in the request body
-  const { refreshToken } = req.body;
+// router.post('/refresh-token', authorizationMiddleware, (req, res) => {
+//   // Assuming the refresh token is in the request body
+//   const { refreshToken } = req.body;
 
-  // Verify the refresh token
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(401);
+//   // Verify the refresh token
+//   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+//     if (err) return res.sendStatus(401);
 
-    // If the refresh token is valid, create a new access token
-    const accessToken = jwt.sign(
-      { username: user.username },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '1h' }
-    );
+//     // If the refresh token is valid, create a new access token
+//     const accessToken = jwt.sign(
+//       { username: user.username },
+//       process.env.ACCESS_TOKEN_SECRET,
+//       { expiresIn: '1h' }
+//     );
 
-    return res.json({ accessToken });
-  });
-});
+//     return res.json({ accessToken });
+//   });
+// });
 
 export default router;

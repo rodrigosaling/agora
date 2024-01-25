@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import express from 'express';
 import knex from 'knex';
-// import * as jose from 'jose';
+import * as jose from 'jose';
 import knexConfig from '../db/knexfile';
 
 const env = process.env.NODE_ENV || 'development';
@@ -19,7 +19,12 @@ router.use(async (req, res, next) => {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const jwt = authorization;
 
-  const { payload } = await jose.jwtVerify(jwt, secret);
+  let payload;
+  try {
+    ({ payload } = await jose.jwtVerify(jwt, secret));
+  } catch (error) {
+    return res.status(401).json({ error: 'JWT problem!' });
+  }
 
   const person = await sql('people')
     .select('hash')

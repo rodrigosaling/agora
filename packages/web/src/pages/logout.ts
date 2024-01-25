@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LOCAL_STORAGE_TOKEN } from '../constants/local-storage';
+import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
 
 function Logout() {
   const navigate = useNavigate();
@@ -8,7 +8,7 @@ function Logout() {
   useEffect(() => {
     // localStorage.removeItem(LOCAL_STORAGE_PERSON_HASH);
     // localStorage.removeItem(LOCAL_STORAGE_PERSON_NAME);
-    localStorage.removeItem(LOCAL_STORAGE_TOKEN);
+    localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN);
     navigate('/');
   }, [navigate]);
 

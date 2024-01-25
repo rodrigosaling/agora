@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { SERVER_URL } from '../constants/server-url';
-import { LOCAL_STORAGE_TOKEN } from '../constants/local-storage';
+import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
 
 export async function getData(url = '', headers = {}) {
   const response = await fetch(`${SERVER_URL}${url}`, {
@@ -15,6 +15,6 @@ export async function getData(url = '', headers = {}) {
 
 export function getDataWithAuthorization(url = '') {
   return getData(url, {
-    Authorization: localStorage.getItem(LOCAL_STORAGE_TOKEN),
+    Authorization: `Bearer ${localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN)}`,
   });
 }
