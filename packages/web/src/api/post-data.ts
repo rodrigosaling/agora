@@ -6,7 +6,7 @@ export async function postData(url = '', data = {}, headers = {}) {
   const response = await fetch(`${SERVER_URL}${url}`, {
     method: 'POST',
     headers: {
-      // 'Content-Type': 'application/json',
+      'Content-Type': 'application/json',
       // 'Content-Type': 'application/x-www-form-urlencoded',
       ...headers,
     },
