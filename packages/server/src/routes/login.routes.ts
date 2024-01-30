@@ -4,7 +4,8 @@ import knex from 'knex';
 import * as jose from 'jose';
 import knexConfig from '../db/knexfile';
 import { PEOPLE_TABLE_NAME } from '../db/constants/people.constants';
-import { router as authorizationMiddleware } from '../middlewares/authorization-middleware';
+import { createErrorResponse } from '../utils/build-error-response';
+// import { router as authorizationMiddleware } from '../middlewares/authorization-middleware';
 
 const env = process.env.NODE_ENV || 'development';
 const sql = knex(knexConfig[env]);
@@ -13,12 +14,22 @@ export const router = express.Router();
 
 export const LOGIN_BASE_URL = '/login';
 
-router.post('/', async (req, res) => {
-  const { email } = req.body;
+router.post('/', async (request, response) => {
+  const getErrorObject = createErrorResponse(request, response);
+  const { email } = request.body;
+
+  if (!email) {
+    return getErrorObject({
+      status: 400,
+      title: 'Email is required.',
+      detail: 'You can not login without an email.',
+    });
+  }
+
   const sanitizedEmail = email.trim().toLocaleLowerCase();
 
   try {
-    const temporaryRefreshtoken = '18473yrghfbv';
+    const temporaryRefreshToken = '18473yrghfbv';
 
     const results = await sql(PEOPLE_TABLE_NAME)
       .select('name', 'hash')
@@ -26,12 +37,19 @@ router.post('/', async (req, res) => {
 
     if (results.length === 0) {
       // TODO refactor this to send a friendly error message
-      return res.status(404).json('User not found');
+      return getErrorObject({
+        status: 422,
+        title: 'Credential not found.',
+        detail:
+          'The email you entered does not match our records. Please try again.',
+      });
     }
 
     if (results.length !== 1) {
       // TODO refactor this to send a friendly error message
-      return res.status(500).json('Something went very wrong.');
+      return response
+        .status(500)
+        .json({ message: 'Something went very wrong.' });
     }
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -40,14 +58,14 @@ router.post('/', async (req, res) => {
       .setExpirationTime('3hours')
       .sign(secret);
 
-    return res.json({
-      refreshToken: temporaryRefreshtoken,
+    return response.json({
+      refreshToken: temporaryRefreshToken,
       accessToken: token,
     });
   } catch (error) {
-    return res
+    return response
       .status(500)
-      .json({ error: 'Oops! Something went wrong. Please try again later.' });
+      .json({ message: 'Oops! Something went wrong. Please try again later.' });
   }
 });
 

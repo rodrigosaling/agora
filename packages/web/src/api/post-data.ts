@@ -2,20 +2,32 @@
 import { SERVER_URL } from '../constants/server-url';
 import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
 
+export class HttpError extends Error {
+  response: JSON | undefined;
+
+  constructor(message: string, response?: JSON) {
+    super(message);
+    this.response = response;
+  }
+}
+
 export async function postData(url = '', data = {}, headers = {}) {
   const response = await fetch(`${SERVER_URL}${url}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // 'Content-Type': 'application/x-www-form-urlencoded',
       ...headers,
     },
-    body: JSON.stringify(data), // body data type must match "Content-Type" header
+    body: JSON.stringify(data),
   });
+
+  const responseAsJSON = await response.json();
+
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    throw new HttpError(responseAsJSON.title, responseAsJSON);
   }
-  return response.json(); // parses JSON response into native JavaScript objects
+
+  return responseAsJSON;
 }
 
 export function postDataWithAuthorization(url = '', data = {}) {

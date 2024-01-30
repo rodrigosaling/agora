@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+// import '@unocss/reset/tailwind.css';
 // eslint-disable-next-line import/no-unresolved
 import 'virtual:uno.css';
 import './index.css';
