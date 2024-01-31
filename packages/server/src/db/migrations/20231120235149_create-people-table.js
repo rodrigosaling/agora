@@ -5,6 +5,8 @@ export const up = (knex) =>
     table.string('email', 255).notNullable().unique();
     // "UI id" to be used on UI platforms instead of the regular id
     table.string('uiid', 11).notNullable().unique();
+    table.string('passcode', 64).notNullable();
+    table.string('refreshToken', 64).notNullable();
     table.timestamps(true, true, true);
   });
 

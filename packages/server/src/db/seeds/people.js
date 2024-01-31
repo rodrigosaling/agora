@@ -5,6 +5,12 @@ export const seed = async (knex) => {
 
   // Inserts seed entries
   await knex('people').insert([
-    { name: 'Rodrigo', email: 'rodrigosaling@gmail.com', hash: 'a1b2c3e4e5f' },
+    {
+      name: 'Rodrigo',
+      email: 'rodrigosaling@gmail.com',
+      uiid: 'a1b2c3e4e5f',
+      passcode: '123456',
+      refreshToken: 'abc123',
+    },
   ]);
 };

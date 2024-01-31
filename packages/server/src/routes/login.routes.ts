@@ -52,6 +52,9 @@ router.post('/', async (request, response) => {
         .json({ message: 'Something went very wrong.' });
     }
 
+    // TODO create a refreshToken and save it in the database
+    // TODO create a passcode and sabe it in the database
+
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const token = await new jose.SignJWT(results[0])
       .setProtectedHeader({ alg: 'HS256' })
