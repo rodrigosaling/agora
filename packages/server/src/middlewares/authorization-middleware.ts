@@ -27,7 +27,7 @@ router.use(async (req, res, next) => {
   }
 
   const person = await sql('people')
-    .select('hash')
+    .select('uiid')
     .where({ hash: payload.hash })
     .first();
 

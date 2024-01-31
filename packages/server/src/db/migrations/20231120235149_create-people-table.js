@@ -3,7 +3,8 @@ export const up = (knex) =>
     table.increments('id');
     table.string('name', 255).notNullable();
     table.string('email', 255).notNullable().unique();
-    table.string('hash', 11).notNullable().unique();
+    // "UI id" to be used on UI platforms instead of the regular id
+    table.string('uiid', 11).notNullable().unique();
     table.timestamps(true, true, true);
   });
 

@@ -32,7 +32,7 @@ router.post('/', async (request, response) => {
     const temporaryRefreshToken = '18473yrghfbv';
 
     const results = await sql(PEOPLE_TABLE_NAME)
-      .select('name', 'hash')
+      .select('name', 'uiid')
       .where({ email: sanitizedEmail });
 
     if (results.length === 0) {

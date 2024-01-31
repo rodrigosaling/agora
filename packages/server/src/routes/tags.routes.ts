@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 
   try {
     const response = await sql(TAGS_TABLE_NAME)
-      .select('name', 'hash')
+      .select('name', 'uiid')
       .where({ isDeleted: deleted === 'true' });
 
     res.json(response);
@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
   try {
     // TODO check the onConflict or UPSERT syntax for knex
     const results = await sql(TAGS_TABLE_NAME)
-      .select('name', 'hash')
+      .select('name', 'uiid')
       .where({ name: sanitizedName });
 
     if (results.length > 0) {

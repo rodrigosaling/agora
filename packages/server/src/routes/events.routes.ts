@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 
   try {
     const response = await sql(EVENTS_TABLE_NAME)
-      .select('name', 'hash')
+      .select('name', 'uiid')
       .where({ isDeleted: deleted === 'true' });
 
     res.json(response);
@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
     const hash = nanoid(11);
     const now = new Date().toISOString();
 
-    const tagIds = await sql('tags').select('id').whereIn('hash', tagsHashes);
+    const tagIds = await sql('tags').select('id').whereIn('uiid', tagsHashes);
 
     const eventId = await sql(EVENTS_TABLE_NAME).insert(
       {
