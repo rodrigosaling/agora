@@ -1,6 +1,10 @@
 /* eslint-disable import/prefer-default-export */
 import { SERVER_URL } from '../constants/server-url';
-import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
+import {
+  LOCAL_STORAGE_ACCESS_TOKEN,
+  LOCAL_STORAGE_PERSON_EMAIL,
+  LOCAL_STORAGE_REFRESH_TOKEN,
+} from '../constants/local-storage';
 
 export class HttpError extends Error {
   response: JSON | undefined;
@@ -21,9 +25,25 @@ export async function postData(url = '', data = {}, headers = {}) {
     body: JSON.stringify(data),
   });
 
+  // ? wrap this json() in a try catch block?
   const responseAsJSON = await response.json();
 
   if (!response.ok) {
+    // if (responseAsJSON.detail === 'Access token expired.') {
+    //   const refreshResponse = await fetch(
+    //     `${SERVER_URL}/login/refresh-token`,
+    //     {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         refreshToken: localStorage.getItem(LOCAL_STORAGE_REFRESH_TOKEN),
+    //         email: localStorage.getItem(LOCAL_STORAGE_PERSON_EMAIL),
+    //       }),
+    //     }
+    //   );
+    // }
     throw new HttpError(responseAsJSON.title, responseAsJSON);
   }
 

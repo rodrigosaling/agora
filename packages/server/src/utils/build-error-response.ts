@@ -12,6 +12,8 @@ export function createErrorResponse(request: Request, response: Response) {
   // REF: https://lakitna.medium.com/understanding-problem-json-adf68e5cf1f8
   response.set('Content-Type', 'application/problem+json');
 
+  // FIXME I wish we could ditch the response use here and return just an
+  // object that is then returned by the response where this function is called.
   return function buildErrorObject({
     status = 500,
     title = 'Internal Server Error',

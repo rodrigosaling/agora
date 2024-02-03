@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { HttpError, postData } from '../api/post-data';
 import {
   LOCAL_STORAGE_ACCESS_TOKEN,
+  LOCAL_STORAGE_PERSON_EMAIL,
   LOCAL_STORAGE_REFRESH_TOKEN,
 } from '../constants/local-storage';
 import EMAIL_VALIDATION_REGEX from '../constants/email-regex';
@@ -20,9 +21,10 @@ export default function Login() {
   const mutation = useMutation({
     mutationFn: (formData: Record<string, string>) =>
       postData('/login', formData),
-    onSuccess: ({ refreshToken, accessToken }) => {
+    onSuccess: ({ refreshToken, accessToken, email }) => {
       localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN, accessToken);
       localStorage.setItem(LOCAL_STORAGE_REFRESH_TOKEN, refreshToken);
+      localStorage.setItem(LOCAL_STORAGE_PERSON_EMAIL, email);
       navigate('/home');
     },
   });

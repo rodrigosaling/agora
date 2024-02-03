@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import crypto from 'crypto';
 import express from 'express';
 import knex from 'knex';
 import * as jose from 'jose';
@@ -13,6 +14,28 @@ const sql = knex(knexConfig[env]);
 export const router = express.Router();
 
 export const LOGIN_BASE_URL = '/login';
+
+const ACCESS_TOKEN_EXPIRATION = '1mins';
+
+type generateAccessTokenProps = {
+  email: string;
+  uiid: string;
+};
+
+async function generateAccessToken(
+  payload: generateAccessTokenProps
+): Promise<string> {
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const accessToken = await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime(ACCESS_TOKEN_EXPIRATION)
+    .sign(secret);
+  return accessToken;
+}
+
+function generateRefreshToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
 
 router.post('/', async (request, response) => {
   const getErrorObject = createErrorResponse(request, response);
@@ -29,13 +52,11 @@ router.post('/', async (request, response) => {
   const sanitizedEmail = email.trim().toLocaleLowerCase();
 
   try {
-    const temporaryRefreshToken = '18473yrghfbv';
-
-    const results = await sql(PEOPLE_TABLE_NAME)
-      .select('name', 'uiid')
+    const selectResult = await sql(PEOPLE_TABLE_NAME)
+      .select('id', 'uiid')
       .where({ email: sanitizedEmail });
 
-    if (results.length === 0) {
+    if (selectResult.length === 0) {
       // TODO refactor this to send a friendly error message
       return getErrorObject({
         status: 422,
@@ -45,50 +66,112 @@ router.post('/', async (request, response) => {
       });
     }
 
-    if (results.length !== 1) {
+    if (selectResult.length !== 1) {
       // TODO refactor this to send a friendly error message
-      return response
-        .status(500)
-        .json({ message: 'Something went very wrong.' });
+      return getErrorObject({
+        status: 500,
+        title: 'Something went very wrong.',
+        detail: 'Please try again later.',
+      });
     }
 
-    // TODO create a refreshToken and save it in the database
-    // TODO create a passcode and sabe it in the database
+    const person = selectResult[0];
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const token = await new jose.SignJWT(results[0])
-      .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('3hours')
-      .sign(secret);
+    const refreshToken = generateRefreshToken();
+    // const passcode = 123456; // TODO create a passcode and sabe it in the database
+    const updateResult = await sql(PEOPLE_TABLE_NAME)
+      .update({
+        refreshToken,
+        // passcode,
+      })
+      .where({
+        id: person.id,
+      });
+
+    if (!updateResult) {
+      return getErrorObject({
+        status: 500,
+        title: 'Something went very wrong.',
+        detail: 'Please try again later.',
+      });
+    }
+
+    const accessToken = await generateAccessToken({
+      uiid: person.uiid,
+      email: sanitizedEmail,
+    });
 
     return response.json({
-      refreshToken: temporaryRefreshToken,
-      accessToken: token,
+      refreshToken,
+      accessToken,
+      email: sanitizedEmail,
     });
   } catch (error) {
-    return response
-      .status(500)
-      .json({ message: 'Oops! Something went wrong. Please try again later.' });
+    // TODO handle database table non-existence error
+    return getErrorObject({
+      status: 500,
+      title: 'Something went very wrong.',
+      detail: 'Please try again later.',
+    });
   }
 });
 
-// router.post('/refresh-token', authorizationMiddleware, (req, res) => {
-//   // Assuming the refresh token is in the request body
-//   const { refreshToken } = req.body;
+router.post('/refresh-token', async (request, response) => {
+  const getErrorObject = createErrorResponse(request, response);
+  const { refreshToken, email } = request.body;
 
-//   // Verify the refresh token
-//   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-//     if (err) return res.sendStatus(401);
+  try {
+    const results = await sql(PEOPLE_TABLE_NAME)
+      .select('id', 'uiid', 'email')
+      .where({
+        email,
+        refreshToken,
+      });
 
-//     // If the refresh token is valid, create a new access token
-//     const accessToken = jwt.sign(
-//       { username: user.username },
-//       process.env.ACCESS_TOKEN_SECRET,
-//       { expiresIn: '1h' }
-//     );
+    if (results.length !== 1) {
+      return getErrorObject({
+        status: 401,
+        title: 'Unauthorized.',
+        detail: 'You are not authorized to perform this action.',
+      });
+    }
 
-//     return res.json({ accessToken });
-//   });
-// });
+    const person = results[0];
+
+    const accessToken = await generateAccessToken({
+      email: person.email,
+      uiid: person.uiid,
+    });
+
+    const newRefreshToken = generateRefreshToken();
+
+    const updateResult = await sql(PEOPLE_TABLE_NAME)
+      .update({
+        refreshToken: newRefreshToken,
+      })
+      .where({
+        id: person.id,
+      });
+
+    if (!updateResult) {
+      return getErrorObject({
+        status: 500,
+        title: 'Something went very wrong.',
+        detail: 'Please try again later.',
+      });
+    }
+
+    return response.json({
+      accessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error) {
+    return getErrorObject({
+      status: 500,
+      title: 'Something went wrong.',
+      detail: 'Please try again later.',
+    });
+  }
+});
 
 export default router;
