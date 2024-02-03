@@ -5,7 +5,7 @@ export const up = (knex) =>
     // "UI id" to be used on UI platforms instead of the regular id
     table.string('uiid', 11).notNullable().unique();
     table.boolean('isDeleted').notNullable().defaultTo(false);
-    table.timestamps(true, true, true);
+    table.timestamps(false, true, true);
   });
 
 export const down = (knex) => knex.schema.dropTable('families');

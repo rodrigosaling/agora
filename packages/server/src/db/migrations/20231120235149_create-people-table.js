@@ -7,7 +7,10 @@ export const up = (knex) =>
     table.string('uiid', 11).notNullable().unique();
     table.string('passcode', 64).notNullable();
     table.string('refreshToken', 64).notNullable();
-    table.timestamps(true, true, true);
+
+    // FIXME https://stackoverflow.com/a/48028011/785985
+    // Create columns manually
+    table.timestamps(false, true, true);
   });
 
 export const down = (knex) => knex.schema.dropTable('people');

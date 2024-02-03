@@ -4,7 +4,7 @@ export const up = (knex) =>
     table.integer('peopleId').unsigned().notNullable();
     table.integer('eventId').unsigned().notNullable();
     table.boolean('isDeleted').notNullable().defaultTo(false);
-    table.timestamps(true, true, true);
+    table.timestamps(false, true, true);
 
     table.foreign('peopleId').references('id').inTable('people');
     table.foreign('eventId').references('id').inTable('events');

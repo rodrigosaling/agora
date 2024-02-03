@@ -9,7 +9,7 @@ export const up = (knex) =>
     table.string('uiid', 11).notNullable().unique();
     table.boolean('isPersonal').notNullable().defaultTo(true);
     table.boolean('isDeleted').notNullable().defaultTo(false);
-    table.timestamps(true, true, true);
+    table.timestamps(false, true, true);
   });
 
 export const down = (knex) => knex.schema.dropTable(EVENTS_TABLE_NAME);
