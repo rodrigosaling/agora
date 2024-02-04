@@ -15,7 +15,7 @@ export const router = express.Router();
 
 export const LOGIN_BASE_URL = '/login';
 
-const ACCESS_TOKEN_EXPIRATION = '1mins';
+const ACCESS_TOKEN_EXPIRATION = '2weeks';
 
 type generateAccessTokenProps = {
   email: string;
