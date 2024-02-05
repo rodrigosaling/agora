@@ -6,6 +6,8 @@ import express from 'express';
 import { nanoid } from 'nanoid';
 import { TAGS_TABLE_NAME } from '../db/constants/tags.constants';
 import { sql } from '../db/sql';
+import { tagNamesSanitizer } from '../utils/tag-names-sanitizer';
+import { createErrorResponse } from '../utils/build-error-response';
 
 export const router = express.Router();
 
@@ -46,31 +48,27 @@ router.get('/', async (req, res) => {
  * @returns The created tag as a JSON response.
  */
 router.post('/', async (req, res) => {
-  const { name } = req.body;
-  const sanitizedName = name.trim().toLocaleLowerCase();
+  const getErrorObject = createErrorResponse(req, res);
+  const { names } = req.body;
+  const sanitizedNames = tagNamesSanitizer(names);
+  const namesToInsert = sanitizedNames.map((name) => ({
+    name,
+    uiid: nanoid(11),
+  }));
+
   try {
-    // TODO check the onConflict or UPSERT syntax for knex
-    const results = await sql(TAGS_TABLE_NAME)
-      .select('name', 'uiid')
-      .where({ name: sanitizedName });
+    const result = await sql(TAGS_TABLE_NAME)
+      .insert(namesToInsert, ['name', 'uiid'])
+      .onConflict('name')
+      .merge(['name']);
 
-    if (results.length > 0) {
-      // TODO refactor this to send a friendly error message
-      return res.status(409).json(results[0]);
-    }
-
-    const uiid = nanoid(11);
-
-    await sql(TAGS_TABLE_NAME).insert({
-      name,
-      uiid,
-    });
-
-    return res.json({ uiid, name });
+    return res.json(result);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: 'Oops! Something went wrong. Please try again later.' });
+    return getErrorObject({
+      status: 500,
+      title: 'Problem inserting tags',
+      detail: error.message,
+    });
   }
 });
 

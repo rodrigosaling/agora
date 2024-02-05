@@ -6,8 +6,8 @@ import { postDataWithAuthorization } from '../api/post-data';
 import { putDataWithAuthorization } from '../api/put-data';
 import Header from '../components/header';
 
-type Inputs = {
-  name: string;
+type FormInputs = {
+  names: string;
 };
 
 type Tags = {
@@ -29,25 +29,25 @@ export default function Tags() {
   });
 
   const createTag = useMutation({
-    mutationFn: (formData) => postDataWithAuthorization('/tags', formData),
+    mutationFn: (formData: FormInputs) =>
+      postDataWithAuthorization('/tags', formData),
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'], exact: true });
     },
   });
 
   const deleteTag = useMutation({
-    mutationFn: (uiid) => putDataWithAuthorization(`/tags/${uiid}/delete`),
+    mutationFn: (uiid: string) =>
+      putDataWithAuthorization(`/tags/${uiid}/delete`),
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'] });
     },
   });
 
   const restoreTag = useMutation({
-    mutationFn: (uiid) => putDataWithAuthorization(`/tags/${uiid}/restore`),
+    mutationFn: (uiid: string) =>
+      putDataWithAuthorization(`/tags/${uiid}/restore`),
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'] });
     },
   });
@@ -57,9 +57,9 @@ export default function Tags() {
     handleSubmit,
     // watch,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<FormInputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = (formData) => {
+  const onSubmit: SubmitHandler<FormInputs> = (formData) => {
     createTag.mutate(formData);
   };
 
@@ -77,18 +77,24 @@ export default function Tags() {
       <hr />
       <main>
         <h2>Adicionar uma tag</h2>
+        <p>
+          Utilize o campo abaixo para adicionar várias tags de uma só vez. Você
+          pode separar elas com uma nova linha ou usando uma vírgula.
+        </p>
         {/* "handleSubmit" will validate your inputs before invoking "onSubmit" */}
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* register your input into the hook by invoking the "register" function */}
-          <input
-            {...register('name', { required: true })}
-            id="name-something"
+          <textarea
+            {...register('names', { required: true })}
+            id="tags-bulk-insert"
             data-1p-ignore
+            className="border p-2 rounded border-gray-300 rounded-md w-xs font-sans"
+            placeholder="palavra1, palavra2, palavra3"
           />
           {/* include validation with required or other standard HTML validation rules */}
           {/* <input {...register('exampleRequired', { required: true })} /> */}
           {/* errors will return when field validation fails  */}
-          {errors.name && <span>This field is required</span>}
+          {errors.names && <span>This field is required</span>}
           <button type="submit">Send</button>
           {createTag.isPending ? (
             <div>Adding todo...</div>
