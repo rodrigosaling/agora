@@ -59,14 +59,14 @@ router.post('/', async (req, res) => {
       return res.status(409).json(results[0]);
     }
 
-    const hash = nanoid(11);
+    const uiid = nanoid(11);
 
     await sql(TAGS_TABLE_NAME).insert({
       name,
-      hash,
+      uiid,
     });
 
-    return res.json({ hash, name });
+    return res.json({ uiid, name });
   } catch (error) {
     return res
       .status(500)
@@ -75,7 +75,7 @@ router.post('/', async (req, res) => {
 });
 
 /**
- * PUT /tags/:hash
+ * PUT /tags/:uiid
  *
  * Updates the name of a tag in the database.
  *
@@ -83,18 +83,18 @@ router.post('/', async (req, res) => {
  * @param res - The response object.
  * @returns The updated tag as a JSON response.
  */
-router.put('/:hash', async (req, res) => {
-  const { hash } = req.params;
+router.put('/:uiid', async (req, res) => {
+  const { uiid } = req.params;
   const { name } = req.body;
 
   try {
     await sql(TAGS_TABLE_NAME)
       .where({
-        hash,
+        uiid,
       })
       .update({ name });
 
-    res.json({ hash, name });
+    res.json({ uiid, name });
   } catch (error) {
     res
       .status(500)
@@ -103,7 +103,7 @@ router.put('/:hash', async (req, res) => {
 });
 
 /**
- * PUT /tags/:hash/delete
+ * PUT /tags/:uiid/delete
  *
  * Logically deletes a tag in the database.
  *
@@ -111,17 +111,17 @@ router.put('/:hash', async (req, res) => {
  * @param res - The response object.
  * @returns The deleted tag as a JSON response.
  */
-router.put('/:hash/delete', async (req, res) => {
-  const { hash } = req.params;
+router.put('/:uiid/delete', async (req, res) => {
+  const { uiid } = req.params;
 
   try {
     await sql(TAGS_TABLE_NAME)
       .where({
-        hash,
+        uiid,
       })
       .update({ isDeleted: true });
 
-    res.json({ hash });
+    res.json({ uiid });
   } catch (error) {
     res
       .status(500)
@@ -130,7 +130,7 @@ router.put('/:hash/delete', async (req, res) => {
 });
 
 /**
- * PUT /tags/:hash/restore
+ * PUT /tags/:uiid/restore
  *
  * Restores a logically deleted tag in the database.
  *
@@ -138,17 +138,17 @@ router.put('/:hash/delete', async (req, res) => {
  * @param res - The response object.
  * @returns The restored tag as a JSON response.
  */
-router.put('/:hash/restore', async (req, res) => {
-  const { hash } = req.params;
+router.put('/:uiid/restore', async (req, res) => {
+  const { uiid } = req.params;
 
   try {
     await sql(TAGS_TABLE_NAME)
       .where({
-        hash,
+        uiid,
       })
       .update({ isDeleted: false });
 
-    res.json({ hash });
+    res.json({ uiid });
   } catch (error) {
     res
       .status(500)
@@ -157,7 +157,7 @@ router.put('/:hash/restore', async (req, res) => {
 });
 
 /**
- * DELETE /tags/:hash
+ * DELETE /tags/:uiid
  *
  * Physically deletes a tag from the database.
  *
@@ -165,12 +165,12 @@ router.put('/:hash/restore', async (req, res) => {
  * @param res - The response object.
  * @returns The deleted tag as a JSON response.
  */
-router.delete('/:hash', async (req, res) => {
-  const { hash } = req.params;
+router.delete('/:uiid', async (req, res) => {
+  const { uiid } = req.params;
 
   try {
-    await sql(TAGS_TABLE_NAME).where({ hash }).delete();
-    res.json({ hash });
+    await sql(TAGS_TABLE_NAME).where({ uiid }).delete();
+    res.json({ uiid });
   } catch (error) {
     res
       .status(500)

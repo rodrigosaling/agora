@@ -12,7 +12,7 @@ type Inputs = {
 
 type Tags = {
   name: string;
-  hash: string;
+  uiid: string;
 };
 
 export default function Tags() {
@@ -37,7 +37,7 @@ export default function Tags() {
   });
 
   const deleteTag = useMutation({
-    mutationFn: (hash) => putDataWithAuthorization(`/tags/${hash}/delete`),
+    mutationFn: (uiid) => putDataWithAuthorization(`/tags/${uiid}/delete`),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'] });
@@ -45,7 +45,7 @@ export default function Tags() {
   });
 
   const restoreTag = useMutation({
-    mutationFn: (hash) => putDataWithAuthorization(`/tags/${hash}/restore`),
+    mutationFn: (uiid) => putDataWithAuthorization(`/tags/${uiid}/restore`),
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tags'] });
@@ -63,12 +63,12 @@ export default function Tags() {
     createTag.mutate(formData);
   };
 
-  const handleDelete = (hash: string) => {
-    deleteTag.mutate(hash);
+  const handleDelete = (uiid: string) => {
+    deleteTag.mutate(uiid);
   };
 
-  const handleRestore = (hash: string) => {
-    restoreTag.mutate(hash);
+  const handleRestore = (uiid: string) => {
+    restoreTag.mutate(uiid);
   };
 
   return (
@@ -111,12 +111,12 @@ export default function Tags() {
         <ul>
           {queryTags.data &&
             queryTags.data.map((tag: Tags) => (
-              <li key={tag.hash}>
+              <li key={tag.uiid}>
                 {tag.name}
                 <button
                   type="button"
                   className="ml-2"
-                  onClick={() => handleDelete(tag.hash)}
+                  onClick={() => handleDelete(tag.uiid)}
                 >
                   delete
                 </button>
@@ -132,12 +132,12 @@ export default function Tags() {
         <ul>
           {queryDeletedTags.data &&
             queryDeletedTags.data.map((tag: Tags) => (
-              <li key={tag.hash}>
+              <li key={tag.uiid}>
                 {tag.name}
                 <button
                   type="button"
                   className="ml-2"
-                  onClick={() => handleRestore(tag.hash)}
+                  onClick={() => handleRestore(tag.uiid)}
                 >
                   restore
                 </button>

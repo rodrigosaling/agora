@@ -46,17 +46,17 @@ router.get('/', async (req, res) => {
  * @returns The created event as a JSON response.
  */
 router.post('/', async (req, res) => {
-  const { tagsHashes } = req.body;
+  const { tagsUIIDs } = req.body;
   try {
-    const hash = nanoid(11);
+    const uiid = nanoid(11);
     const now = new Date().toISOString();
 
-    const tagIds = await sql('tags').select('id').whereIn('uiid', tagsHashes);
+    const tagIds = await sql('tags').select('id').whereIn('uiid', tagsUIIDs);
 
     const eventId = await sql(EVENTS_TABLE_NAME).insert(
       {
         date: now,
-        hash,
+        uiid,
       },
       ['id']
     );
@@ -68,7 +68,7 @@ router.post('/', async (req, res) => {
       }))
     );
 
-    return res.json({ hash });
+    return res.json({ uiid });
   } catch (error) {
     return res
       .status(500)
@@ -77,7 +77,7 @@ router.post('/', async (req, res) => {
 });
 
 /**
- * PUT /events/:hash
+ * PUT /events/:uiid
  *
  * Updates the name of an event in the database.
  *
@@ -85,18 +85,18 @@ router.post('/', async (req, res) => {
  * @param res - The response object.
  * @returns The updated event as a JSON response.
  */
-// router.put('/:hash', async (req, res) => {
-//   const { hash } = req.params;
+// router.put('/:uiid', async (req, res) => {
+//   const { uiid } = req.params;
 //   const { name } = req.body;
 
 //   try {
 //     await sql(EVENTS_TABLE_NAME)
 //       .where({
-//         hash,
+//         uiid,
 //       })
 //       .update({ name });
 
-//     res.json({ hash, name });
+//     res.json({ uiid, name });
 //   } catch (error) {
 //     res
 //       .status(500)
@@ -105,7 +105,7 @@ router.post('/', async (req, res) => {
 // });
 
 /**
- * PUT /events/:hash/delete
+ * PUT /events/:uiid/delete
  *
  * Logically deletes an event in the database.
  *
@@ -113,17 +113,17 @@ router.post('/', async (req, res) => {
  * @param res - The response object.
  * @returns The deleted event as a JSON response.
  */
-// router.put('/:hash/delete', async (req, res) => {
-//   const { hash } = req.params;
+// router.put('/:uiid/delete', async (req, res) => {
+//   const { uiid } = req.params;
 
 //   try {
 //     await sql(EVENTS_TABLE_NAME)
 //       .where({
-//         hash,
+//         uiid,
 //       })
 //       .update({ isDeleted: true });
 
-//     res.json({ hash });
+//     res.json({ uiid });
 //   } catch (error) {
 //     res
 //       .status(500)
@@ -132,7 +132,7 @@ router.post('/', async (req, res) => {
 // });
 
 /**
- * PUT /events/:hash/restore
+ * PUT /events/:uiid/restore
  *
  * Restores a logically deleted event in the database.
  *
@@ -140,17 +140,17 @@ router.post('/', async (req, res) => {
  * @param res - The response object.
  * @returns The restored event as a JSON response.
  */
-// router.put('/:hash/restore', async (req, res) => {
-//   const { hash } = req.params;
+// router.put('/:uiid/restore', async (req, res) => {
+//   const { uiid } = req.params;
 
 //   try {
 //     await sql(EVENTS_TABLE_NAME)
 //       .where({
-//         hash,
+//         uiid,
 //       })
 //       .update({ isDeleted: false });
 
-//     res.json({ hash });
+//     res.json({ uiid });
 //   } catch (error) {
 //     res
 //       .status(500)
@@ -159,7 +159,7 @@ router.post('/', async (req, res) => {
 // });
 
 /**
- * DELETE /events/:hash
+ * DELETE /events/:uiid
  *
  * Physically deletes an event from the database.
  *
@@ -167,12 +167,12 @@ router.post('/', async (req, res) => {
  * @param res - The response object.
  * @returns The deleted event as a JSON response.
  */
-// router.delete('/:hash', async (req, res) => {
-//   const { hash } = req.params;
+// router.delete('/:uiid', async (req, res) => {
+//   const { uiid } = req.params;
 
 //   try {
-//     await sql(EVENTS_TABLE_NAME).where({ hash }).delete();
-//     res.json({ hash });
+//     await sql(EVENTS_TABLE_NAME).where({ uiid }).delete();
+//     res.json({ uiid });
 //   } catch (error) {
 //     res
 //       .status(500)
