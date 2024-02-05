@@ -63,6 +63,9 @@ export default function Providers() {
     }
   };
 
+  // [useState] This ensures that data is not shared between different users and
+  // requests, while still only creating the QueryClient once per component lifecycle.
+  // https://tanstack.com/query/v4/docs/framework/react/guides/ssr#using-hydration
   const [queryClient] = useState(
     () =>
       new QueryClient({
