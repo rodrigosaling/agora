@@ -24,33 +24,6 @@ import {
 } from './constants/local-storage';
 import { SERVER_URL } from './constants/server-url';
 
-// const queryClient = new QueryClient({
-//   defaultOptions: {
-//     queries: {
-//       staleTime: 30000, // 30 seconds
-//       retry: (failureCount, error) => {
-//         // Don't retry for certain error responses
-//         if (
-//           error?.response?.status === 400 ||
-//           error?.response?.status === 401
-//         ) {
-//           return false;
-//         }
-
-//         // Retry others just once
-//         return failureCount <= 1;
-//       },
-//     },
-//   },
-//   queryCache: new QueryCache({
-//     onError: (error) => {
-//       if (error?.response?.status === 400 || error?.response?.status === 401) {
-//         refreshAuthToken();
-//       }
-//     },
-//   }),
-// });
-
 const router = createBrowserRouter([
   {
     path: '/',
@@ -86,6 +59,7 @@ const router = createBrowserRouter([
 //   children: ReactNode;
 // };
 
+// FIXME make this NOT a global variable
 let isRefreshingToken = false;
 
 function Providers() {
@@ -157,7 +131,10 @@ function Providers() {
               error?.response?.status === 401
             ) {
               await refreshAuthToken();
-              queryClient.invalidateQueries({ queryKey: query.queryKey });
+              queryClient.invalidateQueries({
+                queryKey: query.queryKey,
+                exact: true,
+              });
             }
           },
         }),
