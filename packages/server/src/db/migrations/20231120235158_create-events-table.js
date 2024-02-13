@@ -7,7 +7,6 @@ export const up = (knex) =>
     table.datetime('date').notNullable();
     // "UI id" to be used on UI platforms instead of the regular id
     table.string('uiid', 11).notNullable().unique();
-    table.boolean('isPersonal').notNullable().defaultTo(true);
     table.boolean('isDeleted').notNullable().defaultTo(false);
     table.timestamps(false, true, true);
   });

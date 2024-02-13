@@ -1,10 +1,13 @@
+/* eslint-disable import/extensions */
+import { PEOPLE_TABLE_NAME } from '../constants/people.constants.js';
+
 /* eslint-disable import/prefer-default-export */
 export const seed = async (knex) => {
   // Deletes ALL existing entries
-  await knex('people').del();
+  await knex(PEOPLE_TABLE_NAME).del();
 
   // Inserts seed entries
-  await knex('people').insert([
+  await knex(PEOPLE_TABLE_NAME).insert([
     {
       name: 'Rodrigo',
       email: 'rodrigosaling@gmail.com',
