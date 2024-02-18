@@ -1,5 +1,5 @@
 {
-  "name": "@events/server",
+  "name": "@agora/server",
   "version": "0.0.1",
   "description": "the server side of Events",
   "main": "index.js",

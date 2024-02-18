@@ -1,3 +1,3 @@
-# tag
+# Agora
 
-Save events in your day using only tags.
+Quickly save events that happen in your day.

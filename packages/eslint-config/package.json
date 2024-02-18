@@ -1,5 +1,5 @@
 {
-  "name": "@events/eslint-config",
+  "name": "@agora/eslint-config",
   "version": "0.0.1",
   "main": ".eslintrc.cjs",
   "license": "MIT",
