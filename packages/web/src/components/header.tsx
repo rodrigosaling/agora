@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function Header() {
   return (
     <header>
-      <h1 className="text-indigo ml-12 underline underline-dotted">Events</h1>
+      <h1 className="text-indigo ml-12 underline underline-dotted">Agora</h1>
       <nav>
         <ul>
           <li>

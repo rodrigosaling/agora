@@ -43,7 +43,7 @@ export default function Login() {
   return (
     <main>
       <div className="flex flex-col items-center mt-36">
-        <h1 className="text-2xl font-bold">Events</h1>
+        <h1 className="text-2xl font-bold">Agora</h1>
         <form
           method="POST"
           action="/login"
