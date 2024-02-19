@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useMutation } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { HttpError, postData } from '../api/post-data';
 import {
   LOCAL_STORAGE_ACCESS_TOKEN,
@@ -16,6 +16,12 @@ type Inputs = {
 };
 
 export default function Login() {
+  const { state } = useLocation();
+
+  if (state?.isUnauthorized) {
+    // show some error message
+  }
+
   const navigate = useNavigate();
 
   const mutation = useMutation({
