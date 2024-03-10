@@ -1,7 +1,11 @@
 import Header from '../components/header';
 import { Footer } from '../components/footer';
+import { Tag } from '../types/tag';
+import { useTags } from '../hooks/use-tags';
 
 export default function Home() {
+  const { queryTags } = useTags();
+
   return (
     <>
       <Header />
@@ -19,6 +23,14 @@ export default function Home() {
 
         <h2>Most used tags</h2>
         <p>Click/touch any of these tags to start creating a new event.</p>
+        <ul className="list-none p-0 flex gap-2">
+          {queryTags.data &&
+            queryTags.data.map((tag: Tag) => (
+              <li key={tag.uiid}>
+                <button type="button">{tag.name}</button>
+              </li>
+            ))}
+        </ul>
 
         <h2>Last logged events</h2>
         <p>

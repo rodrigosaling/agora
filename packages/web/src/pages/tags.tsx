@@ -1,32 +1,19 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { getDataWithAuthorization } from '../api/get-data';
 import { postDataWithAuthorization } from '../api/post-data';
 import { putDataWithAuthorization } from '../api/put-data';
 import Header from '../components/header';
+import { Tag } from '../types/tag';
+import { useTags } from '../hooks/use-tags';
 
 type FormInputs = {
   names: string;
 };
 
-type Tags = {
-  name: string;
-  uiid: string;
-};
-
 export default function Tags() {
   const queryClient = useQueryClient();
-
-  const queryTags = useQuery({
-    queryKey: ['tags'],
-    queryFn: () => getDataWithAuthorization('/tags'),
-  });
-
-  const queryDeletedTags = useQuery({
-    queryKey: ['tags', 'deleted'],
-    queryFn: () => getDataWithAuthorization('/tags?deleted=true'),
-  });
+  const { queryTags, queryDeletedTags } = useTags();
 
   const createTag = useMutation({
     mutationFn: (formData: FormInputs) =>
@@ -55,7 +42,6 @@ export default function Tags() {
   const {
     register,
     handleSubmit,
-    // watch,
     formState: { errors },
   } = useForm<FormInputs>();
 
@@ -116,7 +102,7 @@ export default function Tags() {
         )}
         <ul>
           {queryTags.data &&
-            queryTags.data.map((tag: Tags) => (
+            queryTags.data.map((tag: Tag) => (
               <li key={tag.uiid}>
                 {tag.name}
                 <button

@@ -3,7 +3,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { HttpError, postData } from '../api/post-data';
+import { postData } from '../api/post-data';
+import { HttpError } from '../api/http-error';
 import {
   LOCAL_STORAGE_ACCESS_TOKEN,
   LOCAL_STORAGE_PERSON_EMAIL,

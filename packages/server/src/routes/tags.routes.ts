@@ -23,12 +23,12 @@ export const TAGS_BASE_URL = '/tags';
  * @returns The retrieved tags as a JSON response.
  */
 router.get('/', async (req, res) => {
-  const { deleted } = req.query;
+  const isDeleted = Boolean(req.query?.deleted);
 
   try {
     const response = await sql(TAGS_TABLE_NAME)
       .select('name', 'uiid')
-      .where({ isDeleted: deleted === 'true' });
+      .where({ isDeleted });
 
     res.json(response);
   } catch (error) {
@@ -50,6 +50,14 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const getErrorObject = createErrorResponse(req, res);
   const { names } = req.body;
+
+  if (!names?.trim()) {
+    return getErrorObject({
+      status: 400,
+      title: 'Missing data',
+    });
+  }
+
   const sanitizedNames = tagNamesSanitizer(names);
   const namesToInsert = sanitizedNames.map((name) => ({
     name,

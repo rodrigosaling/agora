@@ -1,44 +1,45 @@
 /* eslint-disable import/prefer-default-export */
 import { SERVER_URL } from '../constants/server-url';
-import {
-  LOCAL_STORAGE_ACCESS_TOKEN,
-  LOCAL_STORAGE_PERSON_EMAIL,
-  LOCAL_STORAGE_REFRESH_TOKEN,
-} from '../constants/local-storage';
-import { HttpError } from './post-data';
+import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
+import { HttpError } from './http-error';
 
-export async function getData(url = '', headers = {}) {
-  const response = await fetch(`${SERVER_URL}${url}`, {
-    // method: 'GET',
-    headers: { ...headers },
+type getDataProps = {
+  url: string;
+  headers?: HeadersInit | undefined;
+  searchParams?:
+    | string
+    | string[][]
+    | Record<string, string>
+    | URLSearchParams
+    | undefined;
+};
+export async function getData({ url, headers, searchParams }: getDataProps) {
+  const fetchUrl = new URL(`${SERVER_URL}${url}`);
+  fetchUrl.search = new URLSearchParams(searchParams).toString();
+
+  const response = await fetch(fetchUrl, {
+    headers,
   });
 
   const responseAsJSON = await response.json();
 
   if (!response.ok) {
-    // if (responseAsJSON.detail === 'Access token expired.') {
-    //   const refreshResponse = await fetch(`${SERVER_URL}/login/refresh-token`, {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       refreshToken: localStorage.getItem(LOCAL_STORAGE_REFRESH_TOKEN),
-    //       email: localStorage.getItem(LOCAL_STORAGE_PERSON_EMAIL),
-    //     }),
-    //   });
-
-    //   const { accessToken, refreshToken } = await refreshResponse.json();
-    //   localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN, accessToken);
-    //   localStorage.setItem(LOCAL_STORAGE_REFRESH_TOKEN, refreshToken);
-    // }
     throw new HttpError(responseAsJSON.title, responseAsJSON);
   }
   return responseAsJSON;
 }
 
-export function getDataWithAuthorization(url = '') {
-  return getData(url, {
-    Authorization: `Bearer ${localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN)}`,
+export function getDataWithAuthorization({
+  headers = {},
+  ...props
+}: getDataProps) {
+  return getData({
+    ...props,
+    headers: {
+      ...headers,
+      Authorization: `Bearer ${localStorage.getItem(
+        LOCAL_STORAGE_ACCESS_TOKEN
+      )}`,
+    },
   });
 }
