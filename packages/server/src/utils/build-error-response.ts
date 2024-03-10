@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { Request, Response } from 'express';
 
 type buildErrorObjectProps = {

@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import knex from 'knex';
 import knexConfig from './knexfile';
 import { ENV } from '../constants/env.constants';

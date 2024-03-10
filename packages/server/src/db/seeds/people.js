@@ -1,7 +1,6 @@
 /* eslint-disable import/extensions */
 import { PEOPLE_TABLE_NAME } from '../constants/people.constants.js';
 
-/* eslint-disable import/prefer-default-export */
 export const seed = async (knex) => {
   // Deletes ALL existing entries
   await knex(PEOPLE_TABLE_NAME).del();

@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { SERVER_URL } from '../constants/server-url';
 import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
 

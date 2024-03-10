@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import express from 'express';
 import knex from 'knex';
 import * as jose from 'jose';

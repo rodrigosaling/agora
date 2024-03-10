@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 export const seed = async (knex) => {
   // Deletes ALL existing entries
   await knex('tags').del();
