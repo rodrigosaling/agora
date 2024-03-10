@@ -37,6 +37,7 @@ module.exports = {
         tsx: 'never',
       },
     ],
+    'import/prefer-default-export': 'off',
     // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/issues/302#issuecomment-425512505
     // 'jsx-a11y/label-has-associated-control': [
     //   'error',
