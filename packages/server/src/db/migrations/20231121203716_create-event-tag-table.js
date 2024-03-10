@@ -8,6 +8,7 @@ export const up = (knex) =>
     table.increments('id');
     table.integer('eventId').unsigned().notNullable();
     table.integer('tagId').unsigned().notNullable();
+    table.integer('order').unsigned().notNullable();
     table.boolean('isDeleted').notNullable().defaultTo(false);
     table.timestamps(false, true, true);
 
