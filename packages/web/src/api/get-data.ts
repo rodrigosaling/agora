@@ -2,16 +2,19 @@ import { SERVER_URL } from '../constants/server-url';
 import { LOCAL_STORAGE_ACCESS_TOKEN } from '../constants/local-storage';
 import { HttpError } from './http-error';
 
-type getDataProps = {
-  url: string;
+export type searchParamsProps =
+  | string
+  | string[][]
+  | Record<string, string>
+  | URLSearchParams
+  | undefined;
+
+export type getDataProps = {
+  url?: string;
   headers?: HeadersInit | undefined;
-  searchParams?:
-    | string
-    | string[][]
-    | Record<string, string>
-    | URLSearchParams
-    | undefined;
+  searchParams?: searchParamsProps;
 };
+
 export async function getData({ url, headers, searchParams }: getDataProps) {
   const fetchUrl = new URL(`${SERVER_URL}${url}`);
   fetchUrl.search = new URLSearchParams(searchParams).toString();
@@ -32,13 +35,12 @@ export function getDataWithAuthorization({
   headers = {},
   ...props
 }: getDataProps) {
+  const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN);
   return getData({
     ...props,
     headers: {
       ...headers,
-      Authorization: `Bearer ${localStorage.getItem(
-        LOCAL_STORAGE_ACCESS_TOKEN
-      )}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 }
