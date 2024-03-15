@@ -13,13 +13,13 @@ export function createErrorResponse(request: Request, response: Response) {
 
   // FIXME I wish we could ditch the response use here and return just an
   // object that is then returned by the response where this function is called.
-  return function buildErrorObject({
+  return function sendError({
     status = 500,
     title = 'Internal Server Error',
     detail = 'Something went wrong.',
     instance = request.originalUrl,
-  }: buildErrorObjectProps): Response {
-    return response.status(status).json({
+  }: buildErrorObjectProps) {
+    response.status(status).json({
       timestamp: new Date().toISOString(),
       status,
       title,
