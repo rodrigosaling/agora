@@ -13,6 +13,19 @@ export const router = express.Router();
 
 export const TAGS_BASE_URL = '/tags';
 
+function sanitizeColumnName(columnName: string | undefined): string {
+  const DEFAULT_COLUMN = 'name';
+  const ALLOWED_COLUMNS = [DEFAULT_COLUMN, 'order'];
+
+  const sanitizedColumnName = columnName?.trim().toLowerCase();
+
+  if (!ALLOWED_COLUMNS.includes(sanitizedColumnName)) {
+    return DEFAULT_COLUMN;
+  }
+
+  return sanitizedColumnName;
+}
+
 /**
  * GET /tags
  *
@@ -23,18 +36,23 @@ export const TAGS_BASE_URL = '/tags';
  * @returns The retrieved tags as a JSON response.
  */
 router.get('/', async (req, res) => {
+  const sendError = createErrorResponse(req, res);
   const isDeleted = Boolean(req.query?.deleted);
+  const sanitizedColumnName = sanitizeColumnName(req.query?.orderBy as string);
 
   try {
     const response = await sql(TAGS_TABLE_NAME)
-      .select('name', 'uiid')
-      .where({ isDeleted });
+      .select('name', 'uiid', 'isDeleted')
+      .where({ isDeleted })
+      .orderBy(sanitizedColumnName);
 
     res.json(response);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: 'Oops! Something went wrong. Please try again later.' });
+    sendError({
+      status: 500,
+      title: 'Oops! Something went wrong. Please try again later.',
+      detail: error.message,
+    });
   }
 });
 
@@ -48,11 +66,11 @@ router.get('/', async (req, res) => {
  * @returns The created tag as a JSON response.
  */
 router.post('/', async (req, res) => {
-  const getErrorObject = createErrorResponse(req, res);
+  const sendError = createErrorResponse(req, res);
   const { names } = req.body;
 
   if (!names?.trim()) {
-    return getErrorObject({
+    return sendError({
       status: 400,
       title: 'Missing data',
     });
@@ -72,7 +90,7 @@ router.post('/', async (req, res) => {
 
     return res.json(result);
   } catch (error) {
-    return getErrorObject({
+    return sendError({
       status: 500,
       title: 'Problem inserting tags',
       detail: error.message,
@@ -90,19 +108,30 @@ router.post('/', async (req, res) => {
  * @returns The updated tag as a JSON response.
  */
 router.put('/:uiid', async (req, res) => {
+  const sendError = createErrorResponse(req, res);
+
   const { uiid } = req.params;
-  const { name } = req.body;
+  const { names } = req.body;
+
+  if (!names?.trim()) {
+    return sendError({
+      status: 400,
+      title: 'Missing data',
+    });
+  }
+
+  // const sanitizedNames = tagNamesSanitizer(names);
 
   try {
     await sql(TAGS_TABLE_NAME)
       .where({
         uiid,
       })
-      .update({ name });
+      .update({ names });
 
-    res.json({ uiid, name });
+    return res.json({ uiid, names });
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ error: 'Oops! Something went wrong. Please try again later.' });
   }
