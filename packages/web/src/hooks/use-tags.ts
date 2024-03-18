@@ -8,6 +8,7 @@ import { putDataWithAuthorization } from '../api/put-data';
 export function useTags() {
   const queryClient = useQueryClient();
 
+  // FIXME duplicated code?
   const queryTags = useQuery({
     queryKey: ['tags'],
     queryFn: () => getDataWithAuthorization({ url: '/tags' }),
