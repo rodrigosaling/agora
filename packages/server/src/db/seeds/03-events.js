@@ -12,5 +12,11 @@ export const seed = async (knex) => {
     { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
     { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
     { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
+    { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
+    { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
+    { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
+    { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
+    { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
+    { date: new Date().toISOString(), uiid: nanoid(11), ownerId: 1 },
   ]);
 };
