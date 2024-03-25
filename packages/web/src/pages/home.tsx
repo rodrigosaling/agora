@@ -49,11 +49,13 @@ export default function Home() {
   }
 
   function handleTagsGroupsButtonClick(tags) {
-    createEvent.mutate({ tags });
+    createEvent.mutate(tags);
   }
 
   function handleCreateEventButtonClick() {
-    // add
+    createEvent.mutate(
+      selectedTags.map((uiid, index) => ({ uiid, order: index }))
+    );
   }
 
   const dateTimeFormat = new Intl.DateTimeFormat('pt-br', {
@@ -63,7 +65,6 @@ export default function Home() {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    timeZone: 'UTC',
   });
 
   return (

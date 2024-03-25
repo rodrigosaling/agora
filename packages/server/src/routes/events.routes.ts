@@ -100,7 +100,7 @@ router.get('/', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   const sendError = createErrorResponse(req, res);
-  const { tags } = req.body;
+  const tags = req.body;
 
   try {
     const eventUiid = nanoid(11);

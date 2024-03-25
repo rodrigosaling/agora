@@ -6,8 +6,8 @@ import { postDataWithAuthorization } from '../api/post-data';
 import { putDataWithAuthorization } from '../api/put-data';
 
 type formDataProps = {
-  name: string;
   uiid: string;
+  order: number;
 };
 
 export function useEvents() {
@@ -30,8 +30,8 @@ export function useEvents() {
   });
 
   const createEvent = useMutation({
-    mutationFn: (formData: formDataProps[]) =>
-      postDataWithAuthorization(BASE_URL, formData),
+    mutationFn: (tags: formDataProps[]) =>
+      postDataWithAuthorization(BASE_URL, tags),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
