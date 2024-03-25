@@ -52,8 +52,7 @@ router.get('/', async (req, res) => {
         '=',
         `${TAGS_TABLE_NAME}.id`
       )
-      // TODO change this to order by the number of times the same group of tags is used
-      .orderBy(`${EVENTS_TABLE_NAME}.date`);
+      .orderBy(`${EVENTS_TABLE_NAME}.date`, 'DESC');
 
     const events = response.reduce((accumulator, currentValue) => {
       const lastIndex = accumulator.length - 1;
@@ -100,33 +99,48 @@ router.get('/', async (req, res) => {
  * @returns The created event as a JSON response.
  */
 router.post('/', async (req, res) => {
-  const { tagsUiids } = req.body;
+  const sendError = createErrorResponse(req, res);
+  const { tags } = req.body;
+
   try {
     const eventUiid = nanoid(11);
     const now = new Date().toISOString();
 
-    const tagIds = await sql('tags').select('id').whereIn('uiid', tagsUiids);
+    const tagsUiids = tags.map((tag) => tag.uiid);
 
-    const eventId = await sql(EVENTS_TABLE_NAME).insert(
-      {
-        date: now,
-        uiid: eventUiid,
-      },
-      ['id']
-    );
+    const tagsIds = await sql('tags')
+      .select('id', 'uiid')
+      .whereIn('uiid', tagsUiids);
 
-    await sql('events_tags').insert(
-      tagIds.map((tagId: string) => ({
-        eventId,
-        tagId,
-      }))
-    );
+    sql.transaction(async (trx) => {
+      const eventInsertResponse = await trx(EVENTS_TABLE_NAME).insert(
+        {
+          date: now,
+          uiid: eventUiid,
+          ownerId: 1, // FIXME: get user id from somewhere
+        },
+        ['id']
+      );
 
-    return res.json({ uiid: eventUiid });
+      await trx(EVENT_TAGS_TABLE_NAME).insert(
+        tags.map(({ uiid: tagUiid, order }) => {
+          const tagId = tagsIds.find((tag) => tag.uiid === tagUiid).id;
+          return {
+            eventId: eventInsertResponse[0].id,
+            tagId,
+            order,
+          };
+        })
+      );
+
+      res.json({ uiid: eventUiid });
+    });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: 'Oops! Something went wrong. Please try again later.' });
+    sendError({
+      status: 500,
+      title: 'Oops! Something went wrong. Please try again later.',
+      detail: error.message,
+    });
   }
 });
 

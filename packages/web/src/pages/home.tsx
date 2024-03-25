@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/header';
 import { Footer } from '../components/footer';
 import { Tag } from '../types/tag';
 import { useGetTags } from '../hooks/use-get-tags';
 import { useGetEvents } from '../hooks/use-get-events';
+import { useEvents } from '../hooks/use-events';
 
 type handleSelectedTagsProps = {
   tagUiid: string;
@@ -13,13 +14,28 @@ type handleSelectedTagsProps = {
 export default function Home() {
   const { data: tagsData } = useGetTags();
   const { data: eventsData } = useGetEvents({
-    searchParams: { orderBy: 'mostUsed' },
-  });
-  const { data: lastEventsData } = useGetEvents({
     searchParams: { orderBy: 'date' },
   });
+  const { createEvent } = useEvents();
 
   const [selectedTags, setSelectedTags] = useState([] as string[]);
+
+  const setsOfTags = eventsData?.reduce((accumulator, currentValue) => {
+    const tagsUiids = currentValue.tags.map((tag) => tag.uiid).join('');
+    if (!accumulator[tagsUiids]) {
+      accumulator[tagsUiids] = {
+        key: tagsUiids,
+        amount: 0,
+        tags: currentValue.tags,
+      };
+    }
+    accumulator[tagsUiids].amount += 1;
+    return accumulator;
+  }, {});
+
+  const mostUsedTags = setsOfTags
+    ? Object.values(setsOfTags).sort((a, b) => b.amount - a.amount)
+    : [];
 
   function handleMostUsedTagsButtonClick({
     tagUiid,
@@ -30,6 +46,10 @@ export default function Home() {
     } else {
       setSelectedTags([...selectedTags.filter((item) => item !== tagUiid)]);
     }
+  }
+
+  function handleTagsGroupsButtonClick(tags) {
+    createEvent.mutate({ tags });
   }
 
   function handleCreateEventButtonClick() {
@@ -55,29 +75,34 @@ export default function Home() {
           You are seeing the events related to the group <strong>Work</strong>.
         </p>
 
-        <h2>Most used events</h2>
+        <h2>Most used group of tags to create an event</h2>
         <p>
           When you click/touch an event on this list, it will create the same
           event with the current date and time.
         </p>
         <ul className="list-none p-0 flex gap-2 flex-wrap">
-          {eventsData &&
-            eventsData.map((event) => {
-              const eventDate = new Date(event.date);
-              return (
-                <li
-                  key={event.uiid}
-                  className="border border-solid border-black p-2"
+          {mostUsedTags.length > 0 &&
+            mostUsedTags.map((event) => (
+              <li key={event.key}>
+                <button
+                  type="button"
+                  onClick={() => handleTagsGroupsButtonClick(event.tags)}
+                  className="bg-transparent border-1 border-solid border-black px-2 py-1"
                 >
-                  <p className="m-0">{dateTimeFormat.format(eventDate)}</p>
-                  <ul className="list-none p-0 flex gap-2">
+                  <span className="flex gap-1">
                     {event.tags.map((tag) => (
-                      <li key={tag.uiid}>{tag.name}</li>
+                      <span key={tag.uiid} className="bg-gray-200">
+                        {tag.name}
+                      </span>
                     ))}
-                  </ul>
-                </li>
-              );
-            })}
+                  </span>
+                  <span className="sr-only">
+                    Number of occurrences for this group of tags:
+                  </span>
+                  <span>{event.amount}</span>
+                </button>
+              </li>
+            ))}
         </ul>
 
         <h2>Most used tags</h2>
@@ -129,8 +154,8 @@ export default function Home() {
           the event will open its details.
         </p>
         <ul className="list-none p-0 flex gap-2 flex-wrap">
-          {lastEventsData &&
-            lastEventsData.map((event) => {
+          {eventsData &&
+            eventsData.map((event) => {
               const eventDate = new Date(event.date);
               return (
                 <li

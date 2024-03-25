@@ -5,15 +5,20 @@ import { FormInputs } from '../types/tag';
 import { postDataWithAuthorization } from '../api/post-data';
 import { putDataWithAuthorization } from '../api/put-data';
 
+type formDataProps = {
+  name: string;
+  uiid: string;
+};
+
 export function useEvents() {
   const BASE_URL = '/events';
   const QUERY_KEY = 'events';
   const queryClient = useQueryClient();
 
-  const queryEvents = useQuery({
-    queryKey: [QUERY_KEY],
-    queryFn: () => getDataWithAuthorization({ url: BASE_URL }),
-  });
+  // const queryEvents = useQuery({
+  //   queryKey: [QUERY_KEY],
+  //   queryFn: () => getDataWithAuthorization({ url: BASE_URL }),
+  // });
 
   const queryDeletedEvents = useQuery({
     queryKey: [QUERY_KEY, 'deleted'],
@@ -25,10 +30,10 @@ export function useEvents() {
   });
 
   const createEvent = useMutation({
-    mutationFn: (formData: FormInputs) =>
+    mutationFn: (formData: formDataProps[]) =>
       postDataWithAuthorization(BASE_URL, formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY], exact: true });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });
 
@@ -49,7 +54,7 @@ export function useEvents() {
   });
 
   return {
-    queryEvents,
+    // queryEvents,
     queryDeletedEvents,
     createEvent,
     deleteEvent,

@@ -32,5 +32,9 @@ export const seed = async (knex) => {
     { eventId: 10, tagId: 5, order: 1 },
     { eventId: 11, tagId: 1, order: 0 },
     { eventId: 11, tagId: 5, order: 1 },
+    { eventId: 12, tagId: 5, order: 0 },
+    { eventId: 12, tagId: 1, order: 1 },
+    { eventId: 13, tagId: 5, order: 0 },
+    { eventId: 13, tagId: 1, order: 1 },
   ]);
 };
