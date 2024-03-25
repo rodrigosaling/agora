@@ -93,7 +93,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => handleTagsGroupsButtonClick(event.tags)}
-                  className="bg-transparent border-1 border-solid border-black px-2 py-1"
+                  className="border border-solid border-black px-2 py-1"
                 >
                   <span className="flex gap-1">
                     {event.tags.map((tag) => (
@@ -115,7 +115,11 @@ export default function Home() {
         <p>Click/touch any of these tags to start creating a new event.</p>
         <ul className="list-none p-0 flex gap-2 flex-wrap">
           <li>
-            <button type="button" onClick={handleAddNewTagButtonClick}>
+            <button
+              type="button"
+              onClick={handleAddNewTagButtonClick}
+              className="bg-lime-100"
+            >
               + Add new tag +
             </button>
           </li>
@@ -127,6 +131,7 @@ export default function Home() {
                 <li key={tag.uiid}>
                   <button
                     type="button"
+                    className="border border-solid border-black px-2 py-1"
                     style={isTagSelected ? { backgroundColor: '#88b2ea' } : {}}
                     onClick={() =>
                       handleMostUsedTagsButtonClick({
@@ -153,7 +158,11 @@ export default function Home() {
                 return <li key={tag.uiid}>{tag.name}</li>;
               })}
             </ul>
-            <button type="button" onClick={handleCreateEventButtonClick}>
+            <button
+              type="button"
+              onClick={handleCreateEventButtonClick}
+              className="border border-solid border-black px-2 py-1"
+            >
               create event
             </button>
           </>
