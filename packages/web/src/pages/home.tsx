@@ -19,6 +19,7 @@ export default function Home() {
   const { createEvent } = useEvents();
 
   const [selectedTags, setSelectedTags] = useState([] as string[]);
+  const [showAddTagForm, setShowAddTagForm] = useState(false);
 
   const setsOfTags = eventsData?.reduce((accumulator, currentValue) => {
     const tagsUiids = currentValue.tags.map((tag) => tag.uiid).join('');
@@ -56,6 +57,10 @@ export default function Home() {
     createEvent.mutate(
       selectedTags.map((uiid, index) => ({ uiid, order: index }))
     );
+  }
+
+  function handleAddNewTagButtonClick() {
+    setShowAddTagForm(true);
   }
 
   const dateTimeFormat = new Intl.DateTimeFormat('pt-br', {
@@ -108,7 +113,12 @@ export default function Home() {
 
         <h2>Most used tags</h2>
         <p>Click/touch any of these tags to start creating a new event.</p>
-        <ul className="list-none p-0 flex gap-2">
+        <ul className="list-none p-0 flex gap-2 flex-wrap">
+          <li>
+            <button type="button" onClick={handleAddNewTagButtonClick}>
+              + Add new tag +
+            </button>
+          </li>
           {tagsData &&
             tagsData.map((tag: Tag) => {
               const isTagSelected = selectedTags.includes(tag.uiid);
@@ -176,6 +186,12 @@ export default function Home() {
       </main>
       <hr />
       <Footer />
+      <dialog open={showAddTagForm}>
+        <p>This modal dialog has a groovy backdrop!</p>
+        <button type="button" onClick={() => setShowAddTagForm(false)}>
+          Close
+        </button>
+      </dialog>
     </>
   );
 }
