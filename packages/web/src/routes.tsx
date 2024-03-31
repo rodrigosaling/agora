@@ -4,6 +4,7 @@ import Login from './pages/login';
 import Home from './pages/home';
 import Logout from './pages/logout';
 import Tags from './pages/tags';
+import Events from './pages/events';
 import { LOCAL_STORAGE_PERSON_EMAIL } from './constants/local-storage';
 
 function ProtectedRoutes() {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: '/tags',
         element: <Tags />,
+      },
+      {
+        path: '/events',
+        element: <Events />,
       },
       {
         path: '/reports',

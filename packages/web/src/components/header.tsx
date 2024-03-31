@@ -11,6 +11,9 @@ export default function Header() {
           </li>
           <li>Reports</li>
           <li>
+            <Link to="/events">Events</Link>
+          </li>
+          <li>
             <Link to="/tags">Tags</Link>
           </li>
           <li>Preferences</li>
