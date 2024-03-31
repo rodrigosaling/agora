@@ -37,20 +37,20 @@ router.get('/', async (req, res) => {
         `${EVENTS_TABLE_NAME}.isDeleted`,
         `${EVENT_TAGS_TABLE_NAME}.order`,
         `${TAGS_TABLE_NAME}.uiid AS tagUiid`,
-        `${TAGS_TABLE_NAME}.name AS tagName`
+        `${TAGS_TABLE_NAME}.name AS tagName`,
       )
       .from(EVENTS_TABLE_NAME)
       .join(
         EVENT_TAGS_TABLE_NAME,
         `${EVENTS_TABLE_NAME}.id`,
         '=',
-        `${EVENT_TAGS_TABLE_NAME}.eventId`
+        `${EVENT_TAGS_TABLE_NAME}.eventId`,
       )
       .join(
         TAGS_TABLE_NAME,
         `${EVENT_TAGS_TABLE_NAME}.tagId`,
         '=',
-        `${TAGS_TABLE_NAME}.id`
+        `${TAGS_TABLE_NAME}.id`,
       )
       .orderBy(`${EVENTS_TABLE_NAME}.date`, 'DESC');
 
@@ -112,17 +112,17 @@ router.post('/', async (req, res) => {
       .select('id', 'uiid')
       .whereIn('uiid', tagsUiids);
 
-    sql.transaction(async (trx) => {
-      const eventInsertResponse = await trx(EVENTS_TABLE_NAME).insert(
+    sql.transaction(async (transaction) => {
+      const eventInsertResponse = await transaction(EVENTS_TABLE_NAME).insert(
         {
           date: now,
           uiid: eventUiid,
           ownerId: 1, // FIXME: get user id from somewhere
         },
-        ['id']
+        ['id'],
       );
 
-      await trx(EVENT_TAGS_TABLE_NAME).insert(
+      await transaction(EVENT_TAGS_TABLE_NAME).insert(
         tags.map(({ uiid: tagUiid, order }) => {
           const tagId = tagsIds.find((tag) => tag.uiid === tagUiid).id;
           return {
@@ -130,7 +130,7 @@ router.post('/', async (req, res) => {
             tagId,
             order,
           };
-        })
+        }),
       );
 
       res.json({ uiid: eventUiid });
