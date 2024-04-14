@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Header from '../components/header';
 import { Footer } from '../components/footer';
 import { Tag } from '../types/tag';
@@ -55,7 +55,7 @@ export default function Home() {
 
   function handleCreateEventButtonClick() {
     createEvent.mutate(
-      selectedTags.map((uiid, index) => ({ uiid, order: index }))
+      selectedTags.map((uiid, index) => ({ uiid, order: index })),
     );
   }
 
@@ -153,7 +153,7 @@ export default function Home() {
             <ul className="list-none p-0 flex gap-2">
               {selectedTags.map((tagUiid) => {
                 const tag = tagsData.find(
-                  (originalTag: Tag) => originalTag.uiid === tagUiid
+                  (originalTag: Tag) => originalTag.uiid === tagUiid,
                 );
                 return <li key={tag.uiid}>{tag.name}</li>;
               })}

@@ -5,7 +5,7 @@ import { dirname } from 'path';
 const FILENAME = fileURLToPath(import.meta.url);
 const DIRNAME = dirname(FILENAME);
 
-export const diretorio = {
+export const path = {
   FILENAME,
   DIRNAME,
 };

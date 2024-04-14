@@ -1,11 +1,7 @@
-/**
- * This file contains the routes for handling events in the server.
- */
-
 import express from 'express';
 import { nanoid } from 'nanoid';
 import { EVENTS_TABLE_NAME } from '../db/constants/events.constants';
-import { EVENT_TAGS_TABLE_NAME } from '../db/constants/event-tags.constants';
+import { EVENTS_TAGS_TABLE_NAME } from '../db/constants/event-tags.constants';
 import { TAGS_TABLE_NAME } from '../db/constants/tags.constants';
 import { sql } from '../db/sql';
 import { createErrorResponse } from '../utils/build-error-response';
@@ -14,20 +10,24 @@ export const router = express.Router();
 
 export const EVENTS_BASE_URL = '/events';
 
-/**
- * GET /events
- *
- * Retrieves events from the database based on the 'deleted' query parameter.
- *
- * @param req - The request object.
- * @param res - The response object.
- * @returns The retrieved events as a JSON response.
- */
+// function sanitizeOrderBy(columnName: string | undefined): string {
+//   const DEFAULT_VALUE = 'date';
+//   const ALLOWED_VALUES = [DEFAULT_VALUE, 'mostUsed'];
+
+//   const sanitizedColumnName = columnName?.trim().toLowerCase();
+
+//   if (!ALLOWED_VALUES.includes(sanitizedColumnName)) {
+//     return DEFAULT_VALUE;
+//   }
+
+//   return sanitizedColumnName;
+// }
+
 router.get('/', async (req, res) => {
   const sendError = createErrorResponse(req, res);
 
   // const isDeleted = Boolean(req.query?.deleted);
-  // const sanitizedColumnName = sanitizeColumnName(req.query?.orderBy as string);
+  // const sanitizedOrderBy = sanitizeOrderBy(req.query?.orderBy as string);
 
   try {
     const response = await sql
@@ -35,20 +35,20 @@ router.get('/', async (req, res) => {
         `${EVENTS_TABLE_NAME}.uiid`,
         `${EVENTS_TABLE_NAME}.date`,
         `${EVENTS_TABLE_NAME}.isDeleted`,
-        `${EVENT_TAGS_TABLE_NAME}.order`,
+        `${EVENTS_TAGS_TABLE_NAME}.order`,
         `${TAGS_TABLE_NAME}.uiid AS tagUiid`,
         `${TAGS_TABLE_NAME}.name AS tagName`,
       )
       .from(EVENTS_TABLE_NAME)
       .join(
-        EVENT_TAGS_TABLE_NAME,
+        EVENTS_TAGS_TABLE_NAME,
         `${EVENTS_TABLE_NAME}.id`,
         '=',
-        `${EVENT_TAGS_TABLE_NAME}.eventId`,
+        `${EVENTS_TAGS_TABLE_NAME}.eventId`,
       )
       .join(
         TAGS_TABLE_NAME,
-        `${EVENT_TAGS_TABLE_NAME}.tagId`,
+        `${EVENTS_TAGS_TABLE_NAME}.tagId`,
         '=',
         `${TAGS_TABLE_NAME}.id`,
       )
@@ -89,15 +89,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * POST /events
- *
- * Creates a new event in the database.
- *
- * @param req - The request object.
- * @param res - The response object.
- * @returns The created event as a JSON response.
- */
 router.post('/', async (req, res) => {
   const sendError = createErrorResponse(req, res);
   const tags = req.body;
@@ -112,6 +103,11 @@ router.post('/', async (req, res) => {
       .select('id', 'uiid')
       .whereIn('uiid', tagsUiids);
 
+    const sortedTagsIds = tagsUiids.map((uiid) => {
+      const tag = tagsIds.find((t) => t.uiid === uiid);
+      return tag ? tag.id : null;
+    });
+
     sql.transaction(async (transaction) => {
       const eventInsertResponse = await transaction(EVENTS_TABLE_NAME).insert(
         {
@@ -122,13 +118,14 @@ router.post('/', async (req, res) => {
         ['id'],
       );
 
-      await transaction(EVENT_TAGS_TABLE_NAME).insert(
+      await transaction(EVENTS_TAGS_TABLE_NAME).insert(
         tags.map(({ uiid: tagUiid, order }) => {
           const tagId = tagsIds.find((tag) => tag.uiid === tagUiid).id;
           return {
             eventId: eventInsertResponse[0].id,
             tagId,
             order,
+            tagGroup: sortedTagsIds.join(';'),
           };
         }),
       );
@@ -144,15 +141,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-/**
- * PUT /events/:uiid
- *
- * Updates the name of an event in the database.
- *
- * @param req - The request object.
- * @param res - The response object.
- * @returns The updated event as a JSON response.
- */
 // router.put('/:uiid', async (req, res) => {
 //   const { uiid } = req.params;
 //   const { name } = req.body;
@@ -172,15 +160,6 @@ router.post('/', async (req, res) => {
 //   }
 // });
 
-/**
- * PUT /events/:uiid/delete
- *
- * Logically deletes an event in the database.
- *
- * @param req - The request object.
- * @param res - The response object.
- * @returns The deleted event as a JSON response.
- */
 // router.put('/:uiid/delete', async (req, res) => {
 //   const { uiid } = req.params;
 
@@ -199,15 +178,6 @@ router.post('/', async (req, res) => {
 //   }
 // });
 
-/**
- * PUT /events/:uiid/restore
- *
- * Restores a logically deleted event in the database.
- *
- * @param req - The request object.
- * @param res - The response object.
- * @returns The restored event as a JSON response.
- */
 // router.put('/:uiid/restore', async (req, res) => {
 //   const { uiid } = req.params;
 
@@ -226,15 +196,6 @@ router.post('/', async (req, res) => {
 //   }
 // });
 
-/**
- * DELETE /events/:uiid
- *
- * Physically deletes an event from the database.
- *
- * @param req - The request object.
- * @param res - The response object.
- * @returns The deleted event as a JSON response.
- */
 // router.delete('/:uiid', async (req, res) => {
 //   const { uiid } = req.params;
 

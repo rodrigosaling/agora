@@ -11,6 +11,10 @@ import { router as authorizationMiddleware } from './middlewares/authorization-m
 
 import { sql } from './db/sql';
 import { createErrorResponse } from './utils/build-error-response';
+import {
+  REPORTS_BASE_URL,
+  router as reportsRoutes,
+} from './routes/reports.routes';
 
 const app = express();
 const port = 3000;
@@ -27,6 +31,7 @@ app.get('/', (req, res) => {
 app.use(LOGIN_BASE_URL, loginRoutes);
 app.use(TAGS_BASE_URL, authorizationMiddleware, tagsRoutes);
 app.use(EVENTS_BASE_URL, authorizationMiddleware, eventsRoutes);
+app.use(REPORTS_BASE_URL, authorizationMiddleware, reportsRoutes);
 
 const queryRouter = express.Router();
 

@@ -19,6 +19,7 @@ export function Footer() {
         rows="10"
         defaultValue={rawQuery}
         onChange={(event) => setRawQuery(event.target.value)}
+        className="font-mono"
       />
       <button type="button" onClick={handleQueryButton}>
         query

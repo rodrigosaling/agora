@@ -5,6 +5,7 @@ import Home from './pages/home';
 import Logout from './pages/logout';
 import Tags from './pages/tags';
 import Events from './pages/events';
+import Reports from './pages/reports';
 import { LOCAL_STORAGE_PERSON_EMAIL } from './constants/local-storage';
 
 function ProtectedRoutes() {
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/reports',
-        element: <div>Reports</div>,
+        element: <Reports />,
       },
       {
         path: '/preferences',
