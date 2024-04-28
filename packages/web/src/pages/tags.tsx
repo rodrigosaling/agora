@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useForm, SubmitHandler } from 'react-hook-form';
-import Header from '../components/header';
+import { Header } from '../components/header';
 import { FormInputs, Tag } from '../types/tag';
 import { useTags } from '../hooks/use-tags';
 

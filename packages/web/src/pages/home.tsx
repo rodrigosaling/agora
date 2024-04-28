@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Header from '../components/header';
+import { Header } from '../components/header';
 import { Footer } from '../components/footer';
 import { Tag } from '../types/tag';
 import { useGetTags } from '../hooks/use-get-tags';

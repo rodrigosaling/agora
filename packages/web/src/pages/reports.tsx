@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { useState } from 'react';
 import { Footer } from '../components/footer';
-import Header from '../components/header';
+import { Header } from '../components/header';
 import { useDebounce } from '../hooks/use-debounce';
 import { useReportsSearch } from '../hooks/use-reports-search';
 
