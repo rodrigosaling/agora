@@ -11,12 +11,10 @@ const sql = knex(knexConfig[env]);
 export const router = express.Router();
 
 router.use(async (request, response, next) => {
-  const getErrorObject = createErrorResponse(request, response);
-
   const { authorization } = request.headers;
 
   if (!authorization) {
-    return getErrorObject({
+    return response.locals.sendError({
       status: 401,
       title: 'Unauthorized.',
       detail: 'You are not authorized to perform this action.',
@@ -24,7 +22,7 @@ router.use(async (request, response, next) => {
   }
 
   if (!authorization.startsWith('Bearer ')) {
-    return getErrorObject({
+    return response.locals.sendError({
       status: 401,
       title: 'JWT problem!',
       detail: 'Missing Bearer prefix.',
@@ -39,7 +37,7 @@ router.use(async (request, response, next) => {
     ({ payload } = await jose.jwtVerify(jwt, secret));
   } catch (error) {
     if (error instanceof jose.errors.JWTExpired) {
-      return getErrorObject({
+      return response.locals.sendError({
         status: 401,
         title: 'JWT problem!',
         detail: 'Access token expired.',
@@ -47,14 +45,14 @@ router.use(async (request, response, next) => {
     }
 
     if (error instanceof jose.errors.JWSInvalid) {
-      return getErrorObject({
+      return response.locals.sendError({
         status: 401,
         title: 'JWT problem!',
         detail: 'Invalid access token.',
       });
     }
 
-    return getErrorObject({
+    return response.locals.sendError({
       status: 401,
       title: 'JWT problem!',
       detail: 'You are not authorized to perform this action.',
@@ -66,7 +64,7 @@ router.use(async (request, response, next) => {
     .where({ uiid: payload.uiid });
 
   if (selectResult.length !== 1) {
-    return getErrorObject({
+    return response.locals.sendError({
       status: 401,
       title: 'Unauthorized.',
       detail: 'You are not authorized to perform this action.',

@@ -6,7 +6,11 @@ export function Footer() {
   const [response, setResponse] = useState('');
 
   async function handleQueryButton() {
-    setResponse(await postDataWithAuthorization('/query', { rawQuery }));
+    try {
+      setResponse(await postDataWithAuthorization('/query', { rawQuery }));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (

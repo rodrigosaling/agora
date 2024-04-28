@@ -42,7 +42,7 @@ export default function Reports() {
 
           {data?.events?.length > 0 &&
             data?.events.map((event) => (
-              <li key={event.key}>
+              <li key={event.uiid}>
                 <button
                   type="button"
                   className="border border-solid border-black px-2 py-1"

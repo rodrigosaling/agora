@@ -4,55 +4,30 @@ import { EVENTS_TABLE_NAME } from '../db/constants/events.constants';
 import { EVENTS_TAGS_TABLE_NAME } from '../db/constants/event-tags.constants';
 import { TAGS_TABLE_NAME } from '../db/constants/tags.constants';
 import { sql } from '../db/sql';
-import { createErrorResponse } from '../utils/build-error-response';
+import { getBaseSelectEventsQuery } from '../services/get-base-select-events-query';
 
 export const router = express.Router();
 
 export const EVENTS_BASE_URL = '/events';
 
-// function sanitizeOrderBy(columnName: string | undefined): string {
-//   const DEFAULT_VALUE = 'date';
-//   const ALLOWED_VALUES = [DEFAULT_VALUE, 'mostUsed'];
-
-//   const sanitizedColumnName = columnName?.trim().toLowerCase();
-
-//   if (!ALLOWED_VALUES.includes(sanitizedColumnName)) {
-//     return DEFAULT_VALUE;
-//   }
-
-//   return sanitizedColumnName;
-// }
-
 router.get('/', async (req, res) => {
-  const sendError = createErrorResponse(req, res);
+  const orderBy = req.query?.orderBy as string;
 
-  // const isDeleted = Boolean(req.query?.deleted);
-  // const sanitizedOrderBy = sanitizeOrderBy(req.query?.orderBy as string);
+  let isDeleted = null;
+  if (req.query?.deleted === '1') {
+    isDeleted = true;
+  } else if (req.query?.deleted === '0') {
+    isDeleted = false;
+  }
 
   try {
-    const response = await sql
-      .select(
-        `${EVENTS_TABLE_NAME}.uiid`,
-        `${EVENTS_TABLE_NAME}.date`,
-        `${EVENTS_TABLE_NAME}.isDeleted`,
-        `${EVENTS_TAGS_TABLE_NAME}.order`,
-        `${TAGS_TABLE_NAME}.uiid AS tagUiid`,
-        `${TAGS_TABLE_NAME}.name AS tagName`,
-      )
-      .from(EVENTS_TABLE_NAME)
-      .join(
-        EVENTS_TAGS_TABLE_NAME,
-        `${EVENTS_TABLE_NAME}.id`,
-        '=',
-        `${EVENTS_TAGS_TABLE_NAME}.eventId`,
-      )
-      .join(
-        TAGS_TABLE_NAME,
-        `${EVENTS_TAGS_TABLE_NAME}.tagId`,
-        '=',
-        `${TAGS_TABLE_NAME}.id`,
-      )
-      .orderBy(`${EVENTS_TABLE_NAME}.date`, 'DESC');
+    const selectEventsQuery = getBaseSelectEventsQuery().modify((q) => {
+      if (isDeleted !== null) {
+        q.where(`${EVENTS_TABLE_NAME}.isDeleted`, isDeleted);
+      }
+    });
+
+    const response = await selectEventsQuery;
 
     const events = response.reduce((accumulator, currentValue) => {
       const lastIndex = accumulator.length - 1;
@@ -81,7 +56,7 @@ router.get('/', async (req, res) => {
 
     res.json(events);
   } catch (error) {
-    sendError({
+    res.locals.sendError({
       status: 500,
       title: 'Oops! Something went wrong. Please try again later.',
       detail: error.message,
@@ -90,7 +65,6 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const sendError = createErrorResponse(req, res);
   const tags = req.body;
 
   try {
@@ -133,7 +107,7 @@ router.post('/', async (req, res) => {
       res.json({ uiid: eventUiid });
     });
   } catch (error) {
-    sendError({
+    res.locals.sendError({
       status: 500,
       title: 'Oops! Something went wrong. Please try again later.',
       detail: error.message,

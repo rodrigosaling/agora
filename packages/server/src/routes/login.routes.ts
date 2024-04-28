@@ -23,7 +23,7 @@ type generateAccessTokenProps = {
 };
 
 async function generateAccessToken(
-  payload: generateAccessTokenProps
+  payload: generateAccessTokenProps,
 ): Promise<string> {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const accessToken = await new jose.SignJWT(payload)
@@ -38,11 +38,10 @@ function generateRefreshToken(): string {
 }
 
 router.post('/', async (request, response) => {
-  const getErrorObject = createErrorResponse(request, response);
   const { email } = request.body;
 
   if (!email) {
-    return getErrorObject({
+    return response.locals.sendError({
       status: 400,
       title: 'Email is required.',
       detail: 'You can not login without an email.',
@@ -58,7 +57,7 @@ router.post('/', async (request, response) => {
 
     if (selectResult.length === 0) {
       // TODO refactor this to send a friendly error message
-      return getErrorObject({
+      return response.locals.sendError({
         status: 422,
         title: 'Credential not found.',
         detail:
@@ -68,9 +67,9 @@ router.post('/', async (request, response) => {
 
     if (selectResult.length !== 1) {
       // TODO refactor this to send a friendly error message
-      return getErrorObject({
+      return response.locals.sendError({
         status: 500,
-        title: 'Something went very wrong.',
+        title: 'Something went very wrong. 1',
         detail: 'Please try again later.',
       });
     }
@@ -89,9 +88,9 @@ router.post('/', async (request, response) => {
       });
 
     if (!updateResult) {
-      return getErrorObject({
+      return response.locals.sendError({
         status: 500,
-        title: 'Something went very wrong.',
+        title: 'Something went very wrong. 2',
         detail: 'Please try again later.',
       });
     }
@@ -108,16 +107,15 @@ router.post('/', async (request, response) => {
     });
   } catch (error) {
     // TODO handle database table non-existence error
-    return getErrorObject({
+    return response.locals.sendError({
       status: 500,
-      title: 'Something went very wrong.',
-      detail: 'Please try again later.',
+      title: 'Something went very wrong. 3',
+      detail: error.message,
     });
   }
 });
 
 router.post('/refresh-token', async (request, response) => {
-  const getErrorObject = createErrorResponse(request, response);
   const { refreshToken, email } = request.body;
 
   try {
@@ -129,7 +127,7 @@ router.post('/refresh-token', async (request, response) => {
       });
 
     if (results.length !== 1) {
-      return getErrorObject({
+      return response.locals.sendError({
         status: 401,
         title: 'Unauthorized.',
         detail: 'You are not authorized to perform this action.',
@@ -154,7 +152,7 @@ router.post('/refresh-token', async (request, response) => {
       });
 
     if (!updateResult) {
-      return getErrorObject({
+      return response.locals.sendError({
         status: 500,
         title: 'Something went very wrong.',
         detail: 'Please try again later.',
@@ -166,7 +164,7 @@ router.post('/refresh-token', async (request, response) => {
       refreshToken: newRefreshToken,
     });
   } catch (error) {
-    return getErrorObject({
+    return response.locals.sendError({
       status: 500,
       title: 'Something went wrong.',
       detail: 'Please try again later.',

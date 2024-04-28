@@ -7,7 +7,6 @@ import { nanoid } from 'nanoid';
 import { TAGS_TABLE_NAME } from '../db/constants/tags.constants';
 import { sql } from '../db/sql';
 import { tagNamesSanitizer } from '../utils/tag-names-sanitizer';
-import { createErrorResponse } from '../utils/build-error-response';
 
 export const router = express.Router();
 
@@ -36,7 +35,6 @@ function sanitizeColumnName(columnName: string | undefined): string {
  * @returns The retrieved tags as a JSON response.
  */
 router.get('/', async (req, res) => {
-  const sendError = createErrorResponse(req, res);
   const isDeleted = Boolean(req.query?.deleted);
   const sanitizedColumnName = sanitizeColumnName(req.query?.orderBy as string);
 
@@ -48,7 +46,7 @@ router.get('/', async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    sendError({
+    res.locals.sendError({
       status: 500,
       title: 'Oops! Something went wrong. Please try again later.',
       detail: error.message,
@@ -66,11 +64,10 @@ router.get('/', async (req, res) => {
  * @returns The created tag as a JSON response.
  */
 router.post('/', async (req, res) => {
-  const sendError = createErrorResponse(req, res);
   const { names } = req.body;
 
   if (!names?.trim()) {
-    return sendError({
+    return res.locals.sendError({
       status: 400,
       title: 'Missing data',
     });
@@ -90,7 +87,7 @@ router.post('/', async (req, res) => {
 
     return res.json(result);
   } catch (error) {
-    return sendError({
+    return res.locals.sendError({
       status: 500,
       title: 'Problem inserting tags',
       detail: error.message,
@@ -108,13 +105,11 @@ router.post('/', async (req, res) => {
  * @returns The updated tag as a JSON response.
  */
 router.put('/:uiid', async (req, res) => {
-  const sendError = createErrorResponse(req, res);
-
   const { uiid } = req.params;
   const { names } = req.body;
 
   if (!names?.trim()) {
-    return sendError({
+    return res.locals.sendError({
       status: 400,
       title: 'Missing data',
     });

@@ -3,7 +3,7 @@ import { EVENTS_TABLE_NAME } from '../db/constants/events.constants';
 import { EVENTS_TAGS_TABLE_NAME } from '../db/constants/event-tags.constants';
 import { TAGS_TABLE_NAME } from '../db/constants/tags.constants';
 import { sql } from '../db/sql';
-import { createErrorResponse } from '../utils/build-error-response';
+import { getBaseSelectEventsQuery } from '../services/get-base-select-events-query';
 
 export const router = express.Router();
 
@@ -23,100 +23,91 @@ export const REPORTS_BASE_URL = '/reports';
 // }
 
 router.get('/search', async (req, res) => {
-  const sendError = createErrorResponse(req, res);
   const query = req.query?.q;
+  const sanitizedQuery = query?.toString().trim();
 
   try {
     const tagsResult = await sql
       .select('id', 'name', 'uiid', 'isDeleted')
       .from(TAGS_TABLE_NAME)
-      .whereLike('name', `%${query}%`)
+      .where(
+        sql.raw(`LOWER(name) LIKE ?`, [`%${sanitizedQuery.toLowerCase()}%`]),
+      )
       .andWhere('isDeleted', false);
 
-    const tagsIds = tagsResult.map((tag) => tag.id);
+    const tagsIds = [];
+    const tags = [];
 
-    const tags = tagsResult.map(({ name, uiid, isDeleted }) => ({
-      name,
-      uiid,
-      isDeleted,
-    }));
+    tagsResult.forEach((tag) => {
+      tagsIds.push(tag.id);
+      tags.push({
+        name: tag.name,
+        uiid: tag.uiid,
+        isDeleted: tag.isDeleted,
+      });
+    });
 
     const eventsTagsResult = await sql
-      .select(`${EVENTS_TAGS_TABLE_NAME}.eventId`)
+      .distinct(`${EVENTS_TAGS_TABLE_NAME}.tagGroup`)
       .from(EVENTS_TAGS_TABLE_NAME)
-      .join(
-        EVENTS_TABLE_NAME,
-        `${EVENTS_TAGS_TABLE_NAME}.eventId`,
-        '=',
-        `${EVENTS_TABLE_NAME}.id`,
-      )
-      .join(
-        TAGS_TABLE_NAME,
-        `${EVENTS_TAGS_TABLE_NAME}.tagId`,
-        '=',
-        `${TAGS_TABLE_NAME}.id`,
-      )
-      .whereIn(`${TAGS_TABLE_NAME}.id`, tagsIds)
-      .andWhere(`${EVENTS_TABLE_NAME}.isDeleted`, false)
-      .groupBy(`${EVENTS_TAGS_TABLE_NAME}.tagGroup`)
-      .orderBy(`${EVENTS_TABLE_NAME}.date`, 'DESC');
+      .whereIn(`${EVENTS_TAGS_TABLE_NAME}.tagId`, tagsIds);
 
-    const eventIds = eventsTagsResult.map((event) => event.eventId);
+    const tagsGroups = eventsTagsResult.map((eventTag) => eventTag.tagGroup);
 
-    const eventsResult = await sql
-      .select(
-        `${EVENTS_TABLE_NAME}.uiid`,
-        `${EVENTS_TABLE_NAME}.date`,
-        `${EVENTS_TAGS_TABLE_NAME}.order`,
+    const selectEventsQuery = getBaseSelectEventsQuery().modify((q) => {
+      q.where(`${EVENTS_TABLE_NAME}.isDeleted`, false).whereIn(
         `${EVENTS_TAGS_TABLE_NAME}.tagGroup`,
-        `${TAGS_TABLE_NAME}.uiid AS tagUiid`,
-        `${TAGS_TABLE_NAME}.name AS tagName`,
-      )
-      .from(EVENTS_TABLE_NAME)
-      .join(
-        EVENTS_TAGS_TABLE_NAME,
-        `${EVENTS_TABLE_NAME}.id`,
-        '=',
-        `${EVENTS_TAGS_TABLE_NAME}.eventId`,
-      )
-      .join(
-        TAGS_TABLE_NAME,
-        `${EVENTS_TAGS_TABLE_NAME}.tagId`,
-        '=',
-        `${TAGS_TABLE_NAME}.id`,
-      )
-      .whereIn(`${EVENTS_TABLE_NAME}.id`, eventIds)
-      .orderBy(`${EVENTS_TABLE_NAME}.date`, 'DESC')
-      .orderBy(`${EVENTS_TAGS_TABLE_NAME}.order`, 'ASC');
+        tagsGroups,
+      );
+    });
 
-    const events = eventsResult.reduce((accumulator, currentValue) => {
-      const lastIndex = accumulator.length - 1;
-      if (currentValue.uiid === accumulator[lastIndex]?.uiid) {
-        accumulator[lastIndex].tags.push({
-          uiid: currentValue.tagUiid,
-          name: currentValue.tagName,
-          order: currentValue.order,
-        });
-      } else {
-        accumulator.push({
-          uiid: currentValue.uiid,
-          date: currentValue.date,
-          isDeleted: currentValue.isDeleted,
-          tags: [
-            {
-              uiid: currentValue.tagUiid,
-              name: currentValue.tagName,
-              order: currentValue.order,
-            },
-          ],
-        });
-      }
-      return accumulator;
-    }, []);
+    const eventsResult = await selectEventsQuery;
 
-    res.json({ tags, events });
+    const restructuredEvents = eventsResult.reduce(
+      (accumulator, currentValue) => {
+        const lastIndex = accumulator.length - 1;
+        if (currentValue.uiid === accumulator[lastIndex]?.uiid) {
+          accumulator[lastIndex].tags.push({
+            name: currentValue.tagName,
+            order: currentValue.order,
+          });
+        } else {
+          accumulator.push({
+            uiid: currentValue.uiid,
+            tagGroup: currentValue.tagGroup,
+            tags: [
+              {
+                name: currentValue.tagName,
+                order: currentValue.order,
+              },
+            ],
+          });
+        }
+        return accumulator;
+      },
+      [],
+    );
+
+    const uniqueEvents = restructuredEvents.reduce(
+      (accumulator, currentValue) => {
+        if (!accumulator[currentValue.tagGroup]) {
+          accumulator[currentValue.tagGroup] = {
+            uiid: currentValue.uiid,
+            amount: 0,
+            tags: currentValue.tags.sort((a, b) => a.order - b.order),
+          };
+        }
+        accumulator[currentValue.tagGroup].amount += 1;
+        return accumulator;
+      },
+      {},
+    );
+
+    const sanitizedEvents = Object.values(uniqueEvents);
+
+    res.json({ tags, events: sanitizedEvents });
   } catch (error) {
-    sendError({
+    res.locals.sendError({
       status: 500,
       title: 'Oops! Something went wrong. Please try again later.',
       detail: error.message,
