@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { Header } from '../components/header';
-import { Footer } from '../components/footer';
+import { useRef, useState } from 'react';
 import { Tag } from '../types/tag';
 import { useGetTags } from '../hooks/use-get-tags';
 import { useGetEvents } from '../hooks/use-get-events';
@@ -20,7 +18,7 @@ export default function Home() {
   const { createEvent } = useEvents();
 
   const [selectedTags, setSelectedTags] = useState([] as string[]);
-  const [showAddTagForm, setShowAddTagForm] = useState(false);
+  const dialogRef = useRef(null);
 
   const setsOfTags = eventsData?.reduce((accumulator, currentValue) => {
     const tagsUiids = currentValue.tags.map((tag) => tag.uiid).join('');
@@ -61,7 +59,7 @@ export default function Home() {
   }
 
   function handleAddNewTagButtonClick() {
-    setShowAddTagForm(true);
+    dialogRef.current.showModal();
   }
 
   const dateTimeFormat = new Intl.DateTimeFormat('pt-br', {
@@ -191,9 +189,12 @@ export default function Home() {
           })}
       </ul>
 
-      <dialog open={showAddTagForm}>
+      <dialog
+        ref={dialogRef}
+        className="border border-solid border-black p-2 rounded backdrop:bg-gray-500/50"
+      >
         <p>This modal dialog has a groovy backdrop!</p>
-        <button type="button" onClick={() => setShowAddTagForm(false)}>
+        <button type="button" onClick={() => dialogRef.current.close()}>
           Close
         </button>
       </dialog>
