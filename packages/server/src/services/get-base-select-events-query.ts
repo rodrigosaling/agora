@@ -41,5 +41,6 @@ export function getBaseSelectEventsQuery() {
       '=',
       `${TAGS_TABLE_NAME}.id`,
     )
-    .orderBy(`${EVENTS_TABLE_NAME}.date`, 'DESC');
+    .orderBy(`${EVENTS_TABLE_NAME}.date`, 'DESC')
+    .orderBy(`${EVENTS_TAGS_TABLE_NAME}.order`, 'ASC');
 }
