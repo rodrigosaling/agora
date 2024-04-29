@@ -8,6 +8,8 @@ export const up = (knex) =>
     table.datetime('date').notNullable();
     // "UI id" to be used on UI platforms instead of the regular id
     table.string('uiid', 11).notNullable().unique();
+    table.string('color', 6).notNullable();
+    table.string('backgroundColor', 6).notNullable();
     table.integer('ownerId').unsigned().notNullable();
     table.boolean('isDeleted').notNullable().defaultTo(false);
     table.timestamps(false, true, true);
