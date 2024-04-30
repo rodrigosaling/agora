@@ -11,7 +11,7 @@ export const router = express.Router();
 export const EVENTS_BASE_URL = '/events';
 
 router.get('/', async (req, res) => {
-  const orderBy = req.query?.orderBy as string;
+  // const orderBy = req.query?.orderBy as string;
 
   let isDeleted = null;
   if (req.query?.deleted === '1') {
@@ -110,6 +110,50 @@ router.post('/', async (req, res) => {
     res.locals.sendError({
       status: 500,
       title: 'Oops! Something went wrong. Please try again later.',
+      detail: error.message,
+    });
+  }
+});
+
+router.get('/:uiid', async (req, res) => {
+  const { uiid } = req.params;
+
+  try {
+    const selectEventsQuery = getBaseSelectEventsQuery().modify((q) => {
+      q.where(`${EVENTS_TABLE_NAME}.uiid`, '=', uiid);
+    });
+
+    const response = await selectEventsQuery;
+
+    const event = response.reduce((accumulator, currentValue, currentIndex) => {
+      if (currentIndex > 0) {
+        accumulator.tags.push({
+          uiid: currentValue.tagUiid,
+          name: currentValue.tagName,
+          order: currentValue.order,
+        });
+        return accumulator;
+      }
+
+      accumulator.uiid = currentValue.uiid;
+      accumulator.date = currentValue.date;
+      accumulator.isDeleted = currentValue.isDeleted;
+      accumulator.tags = [
+        {
+          uiid: currentValue.tagUiid,
+          name: currentValue.tagName,
+          order: currentValue.order,
+        },
+      ];
+
+      return accumulator;
+    }, {});
+
+    res.json(event);
+  } catch (error) {
+    res.locals.sendError({
+      status: 500,
+      title: 'Error loading a specific event.',
       detail: error.message,
     });
   }

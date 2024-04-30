@@ -4,6 +4,7 @@ import { useGetTags } from '../hooks/use-get-tags';
 import { useGetEvents } from '../hooks/use-get-events';
 import { useEvents } from '../hooks/use-events';
 import { DefaultTemplate } from '../templates/default';
+import { dateTimeFormat } from '../utils/date-time-format.utils';
 
 type handleSelectedTagsProps = {
   tagUiid: string;
@@ -61,15 +62,6 @@ export default function Home() {
   function handleAddNewTagButtonClick() {
     dialogRef.current.showModal();
   }
-
-  const dateTimeFormat = new Intl.DateTimeFormat('pt-br', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
 
   return (
     <DefaultTemplate>
